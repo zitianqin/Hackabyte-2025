@@ -6,7 +6,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#ffd33d",
+        tabBarActiveTintColor: "#e97e67",
         headerStyle: {
           backgroundColor: "#25292e",
         },
@@ -31,13 +31,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="about"
+        name="pickup"
         options={{
-          title: "About",
+          title: "Pickup",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={
-                focused ? "information-circle" : "information-circle-outline"
+                focused ? "information" : "information-outline"
               }
               color={color}
               size={24}
@@ -45,6 +45,53 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen 
+        name="search"
+        options={{
+          title: "Search", 
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={
+                focused ? "search" : "search-outline"
+              }
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen 
+        name="orders"
+        options={{
+          title: "Orders", 
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={
+                focused ? "receipt" : "receipt-outline"
+              }
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen 
+        name="account"
+        options={{
+          title: "Accounts", 
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons 
+              name={
+                focused ? "information" : "information-outline"
+              }
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      
+      
     </Tabs>
   );
 }
