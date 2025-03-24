@@ -1,22 +1,3 @@
-export const Categories = [
-  {
-    name: "Restaurants",
-    icon: "🍽️",
-  },
-  {
-    name: "Grocery",
-    icon: "🛒",
-  },
-  {
-    name: "Gifts",
-    icon: "🎁",
-  },
-  {
-    name: "Chemist",
-    icon: "💊",
-  },
-];
-
 export const UNSWFoodList = [
   {
     name: "Arthouse Kitchen Café",
