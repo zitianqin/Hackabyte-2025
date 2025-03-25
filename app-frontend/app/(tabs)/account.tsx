@@ -1,8 +1,20 @@
-import { Text, View, StyleSheet, Pressable, ScrollView, Switch, TextInput, Modal } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Switch,
+  TextInput,
+  Modal,
+  Alert,
+} from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAppContext } from "@/services/AppContext";
+import * as SecureStore from "expo-secure-store";
+import { router } from "expo-router";
 
 // Mock data
 const userData = {
@@ -110,7 +122,9 @@ export default function AccountScreen() {
     setHelpModal(false);
   };
 
-  const changeNotificationSettings = (type: "deliveryNotifications" | "promotionalNotifications") => {
+  const changeNotificationSettings = (
+    type: "deliveryNotifications" | "promotionalNotifications"
+  ) => {
     setNotificationSettings({
       ...notificationSettings,
       [type]: !notificationSettings[type],
@@ -119,6 +133,28 @@ export default function AccountScreen() {
 
   const handleProfileToggle = () => {
     setIsPrivateProfile(!isPrivateProfile);
+  };
+
+  const handleLogout = async () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await SecureStore.deleteItemAsync("authToken");
+            router.replace("/auth");
+          } catch (error) {
+            console.error("Logout error:", error);
+            Alert.alert("Error", "Failed to logout. Please try again.");
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -130,9 +166,13 @@ export default function AccountScreen() {
         </View>
         <Text style={styles.userName}>{userData.name}</Text>
         <Text style={styles.userEmail}>{userData.email}</Text>
-        <Text style={styles.memberSince}>Member since {userData.memberSince}</Text>
+        <Text style={styles.memberSince}>
+          Member since {userData.memberSince}
+        </Text>
         <View style={styles.modeIndicator}>
-          <Text style={styles.modeLabel}>{appMode === "customer" ? "Customer Mode" : "Worker Mode"}</Text>
+          <Text style={styles.modeLabel}>
+            {appMode === "customer" ? "Customer Mode" : "Worker Mode"}
+          </Text>
         </View>
       </LinearGradient>
 
@@ -142,24 +182,57 @@ export default function AccountScreen() {
           style={[styles.tab, activeSection === "personal" && styles.activeTab]}
           onPress={() => handleSectionPress("personal")}
         >
-          <Ionicons name="person" size={20} color={activeSection === "personal" ? "#e97e67" : "#ccc"} />
-          <Text style={[styles.tabText, activeSection === "personal" && styles.activeTabText]}>Profile</Text>
+          <Ionicons
+            name="person"
+            size={20}
+            color={activeSection === "personal" ? "#e97e67" : "#ccc"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeSection === "personal" && styles.activeTabText,
+            ]}
+          >
+            Profile
+          </Text>
         </Pressable>
 
         <Pressable
           style={[styles.tab, activeSection === "orders" && styles.activeTab]}
           onPress={() => handleSectionPress("orders")}
         >
-          <Ionicons name="receipt" size={20} color={activeSection === "orders" ? "#e97e67" : "#ccc"} />
-          <Text style={[styles.tabText, activeSection === "orders" && styles.activeTabText]}>Orders</Text>
+          <Ionicons
+            name="receipt"
+            size={20}
+            color={activeSection === "orders" ? "#e97e67" : "#ccc"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeSection === "orders" && styles.activeTabText,
+            ]}
+          >
+            Orders
+          </Text>
         </Pressable>
 
         <Pressable
           style={[styles.tab, activeSection === "settings" && styles.activeTab]}
           onPress={() => handleSectionPress("settings")}
         >
-          <Ionicons name="settings" size={20} color={activeSection === "settings" ? "#e97e67" : "#ccc"} />
-          <Text style={[styles.tabText, activeSection === "settings" && styles.activeTabText]}>Settings</Text>
+          <Ionicons
+            name="settings"
+            size={20}
+            color={activeSection === "settings" ? "#e97e67" : "#ccc"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeSection === "settings" && styles.activeTabText,
+            ]}
+          >
+            Settings
+          </Text>
         </Pressable>
       </View>
 
@@ -171,7 +244,12 @@ export default function AccountScreen() {
 
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
-                <Ionicons name="call-outline" size={20} color="#e97e67" style={styles.infoIcon} />
+                <Ionicons
+                  name="call-outline"
+                  size={20}
+                  color="#e97e67"
+                  style={styles.infoIcon}
+                />
                 <View>
                   <Text style={styles.infoLabel}>Phone Number</Text>
                   <Text style={styles.infoValue}>{userData.phone}</Text>
@@ -181,7 +259,12 @@ export default function AccountScreen() {
 
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
-                <Ionicons name="mail-outline" size={20} color="#e97e67" style={styles.infoIcon} />
+                <Ionicons
+                  name="mail-outline"
+                  size={20}
+                  color="#e97e67"
+                  style={styles.infoIcon}
+                />
                 <View>
                   <Text style={styles.infoLabel}>Email Address</Text>
                   <Text style={styles.infoValue}>{userData.email}</Text>
@@ -191,7 +274,12 @@ export default function AccountScreen() {
 
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
-                <Ionicons name="location-outline" size={20} color="#e97e67" style={styles.infoIcon} />
+                <Ionicons
+                  name="location-outline"
+                  size={20}
+                  color="#e97e67"
+                  style={styles.infoIcon}
+                />
                 <View>
                   <Text style={styles.infoLabel}>Default Location</Text>
                   <Text style={styles.infoValue}>{userData.location}</Text>
@@ -216,10 +304,14 @@ export default function AccountScreen() {
                   <View
                     style={[
                       styles.statusBadge,
-                      order.status === "delivered" ? styles.deliveredBadge : styles.cancelledBadge,
+                      order.status === "delivered"
+                        ? styles.deliveredBadge
+                        : styles.cancelledBadge,
                     ]}
                   >
-                    <Text style={styles.statusText}>{order.status === "delivered" ? "Delivered" : "Cancelled"}</Text>
+                    <Text style={styles.statusText}>
+                      {order.status === "delivered" ? "Delivered" : "Cancelled"}
+                    </Text>
                   </View>
                 </View>
 
@@ -246,14 +338,20 @@ export default function AccountScreen() {
               {/* Mode toggle switch */}
               <View style={styles.settingRow}>
                 <Ionicons
-                  name={appMode === "customer" ? "fast-food-outline" : "bicycle-outline"}
+                  name={
+                    appMode === "customer"
+                      ? "fast-food-outline"
+                      : "bicycle-outline"
+                  }
                   size={22}
                   color="#e97e67"
                   style={styles.settingIcon}
                 />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>
-                    {appMode === "customer" ? "Switch to Delivery Person" : "Switch to Customer"}
+                    {appMode === "customer"
+                      ? "Switch to Delivery Person"
+                      : "Switch to Customer"}
                   </Text>
                   <Text style={styles.settingDescription}>
                     {appMode === "customer"
@@ -269,46 +367,77 @@ export default function AccountScreen() {
                 />
               </View>
 
-              <Pressable style={styles.settingRow} onPress={openNotificationModal}>
-                <Ionicons name="notifications-outline" size={22} color="#e97e67" style={styles.settingIcon} />
+              <Pressable
+                style={styles.settingRow}
+                onPress={openNotificationModal}
+              >
+                <Ionicons
+                  name="notifications-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>Notifications</Text>
-                  <Text style={styles.settingDescription}>Manage delivery and promotional notifications</Text>
+                  <Text style={styles.settingDescription}>
+                    Manage delivery and promotional notifications
+                  </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#ccc" />
               </Pressable>
 
               <Pressable style={styles.settingRow}>
-                <Ionicons name="card-outline" size={22} color="#e97e67" style={styles.settingIcon} />
+                <Ionicons
+                  name="card-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>Payment Methods</Text>
-                  <Text style={styles.settingDescription}>Add or edit payment methods</Text>
+                  <Text style={styles.settingDescription}>
+                    Add or edit payment methods
+                  </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#ccc" />
               </Pressable>
 
               <Pressable style={styles.settingRow} onPress={openPrivacyModal}>
-                <Ionicons name="lock-closed-outline" size={22} color="#e97e67" style={styles.settingIcon} />
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>Privacy</Text>
-                  <Text style={styles.settingDescription}>Manage privacy settings and data</Text>
+                  <Text style={styles.settingDescription}>
+                    Manage privacy settings and data
+                  </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#ccc" />
               </Pressable>
 
               <Pressable style={styles.settingRow} onPress={openHelpModal}>
-                <Ionicons name="help-circle-outline" size={22} color="#e97e67" style={styles.settingIcon} />
+                <Ionicons
+                  name="help-circle-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>Help & Support</Text>
-                  <Text style={styles.settingDescription}>Contact customer service</Text>
+                  <Text style={styles.settingDescription}>
+                    Contact customer service
+                  </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#ccc" />
               </Pressable>
             </View>
 
-            <Pressable style={styles.logoutButton}>
-              <Ionicons name="log-out-outline" size={20} color="#fff" style={styles.logoutIcon} />
-              <Text style={styles.logoutText}>Log Out</Text>
+            <Pressable style={styles.logoutButton} onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={24} color="#ff4444" />
+              <Text style={styles.logoutText}>Logout</Text>
             </Pressable>
           </View>
         )}
@@ -338,7 +467,10 @@ export default function AccountScreen() {
               onChangeText={(text) => handleInputChange("phone", text)}
             />
             <View style={styles.modalButtons}>
-              <Pressable style={styles.cancelButton} onPress={() => setEditProfileModal(false)}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={() => setEditProfileModal(false)}
+              >
                 <Text style={styles.buttonText}>Cancel</Text>
               </Pressable>
               <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
@@ -361,9 +493,15 @@ export default function AccountScreen() {
               <ScrollView style={styles.notificationHistoryContainer}>
                 {notifications.map((notification) => (
                   <View key={notification.id} style={styles.notificationCard}>
-                    <Text style={styles.notificationTitle}>{notification.title}</Text>
-                    <Text style={styles.notificationDate}>{notification.date}</Text>
-                    <Text style={styles.notificationDescription}>{notification.description}</Text>
+                    <Text style={styles.notificationTitle}>
+                      {notification.title}
+                    </Text>
+                    <Text style={styles.notificationDate}>
+                      {notification.date}
+                    </Text>
+                    <Text style={styles.notificationDescription}>
+                      {notification.description}
+                    </Text>
                   </View>
                 ))}
               </ScrollView>
@@ -374,19 +512,27 @@ export default function AccountScreen() {
               <Text style={styles.sectionTitle}>Notification Settings</Text>
               <View style={styles.notifRow}>
                 <View style={styles.type}>
-                  <Text style={styles.settingTitle}>Delivery Notifications</Text>
+                  <Text style={styles.settingTitle}>
+                    Delivery Notifications
+                  </Text>
                   <Switch
                     value={notificationSettings.deliveryNotifications}
-                    onValueChange={() => changeNotificationSettings("deliveryNotifications")}
+                    onValueChange={() =>
+                      changeNotificationSettings("deliveryNotifications")
+                    }
                     trackColor={{ false: "#4f5d75", true: "#e97e67" }}
                     thumbColor="#fff"
                   />
                 </View>
                 <View style={styles.type}>
-                  <Text style={styles.settingTitle}>Promotional Notifications</Text>
+                  <Text style={styles.settingTitle}>
+                    Promotional Notifications
+                  </Text>
                   <Switch
                     value={notificationSettings.promotionalNotifications}
-                    onValueChange={() => changeNotificationSettings("promotionalNotifications")}
+                    onValueChange={() =>
+                      changeNotificationSettings("promotionalNotifications")
+                    }
                     trackColor={{ false: "#4f5d75", true: "#e97e67" }}
                     thumbColor="#fff"
                   />
@@ -395,7 +541,10 @@ export default function AccountScreen() {
             </View>
 
             <View style={styles.modalButtons}>
-              <Pressable style={styles.cancelButton} onPress={openNotificationModal}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={openNotificationModal}
+              >
                 <Text style={styles.buttonText}>Cancel</Text>
               </Pressable>
               <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
@@ -455,7 +604,9 @@ export default function AccountScreen() {
               <View style={styles.helpCard}>
                 <Text style={styles.helpCardTitle}>Enquire Online</Text>
                 <Text style={styles.helpCardDescription}>fatcow@gmail.com</Text>
-                <Text style={styles.helpCardDescription}>Tell us the important details and we'll be in touch.</Text>
+                <Text style={styles.helpCardDescription}>
+                  Tell us the important details and we'll be in touch.
+                </Text>
               </View>
             </View>
 
@@ -695,21 +846,15 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   logoutButton: {
-    backgroundColor: "#e74c3c",
-    borderRadius: 8,
-    padding: 14,
-    alignItems: "center",
-    marginTop: 8,
     flexDirection: "row",
-    justifyContent: "center",
-  },
-  logoutIcon: {
-    marginRight: 8,
+    alignItems: "center",
+    backgroundColor: "#25292e",
+    marginTop: 20,
   },
   logoutText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 15,
+    color: "#ff4444",
+    fontSize: 16,
+    marginLeft: 10,
   },
 
   modalContainer: {
