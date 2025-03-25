@@ -1,13 +1,24 @@
-import { Text, View, StyleSheet, Image, ScrollView } from "react-native";
+import { Text, View, StyleSheet, Image, ScrollView, TextInput } from "react-native";
 import { UNSWFoodList } from "../../components/UNSWFood";
+import React from "react";
 
 export default function SearchScreen() {
+  const [search, setSearch] = React.useState("");
+  const filteredOptions = UNSWFoodList.filter((f) => f.name.toLowerCase().includes(search.toLowerCase()));
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.row}>
         <Text style={styles.heading}>Explore Food On Campus</Text>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search for cravings..."
+          placeholderTextColor="#aaa"
+          value={search}
+          onChangeText={setSearch}
+        />
         <View style={styles.cardsList}>
-          {UNSWFoodList.map((c, index) => (
+          {filteredOptions.map((c, index) => (
             <View key={index} style={styles.card}>
               <Text style={styles.cardTitle}>{c.name}</Text>
               <Text style={styles.cardDescription}>Location: {c.location}</Text>
@@ -26,6 +37,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#25292e",
     color: "#fff",
     padding: 20,
+  },
+  searchBar: {
+    width: "75%",
+    backgroundColor: "#3b4957",
+    padding: 15,
+    borderRadius: 10,
+    color: "#fff",
+    fontSize: 14,
+    marginTop: 10,
+    alignSelf: "center",
   },
   row: {
     width: "100%",
@@ -53,7 +74,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexDirection: "column",
     borderRadius: 20,
-    backgroundColor: "#4F5D75",
+    backgroundColor: "#4f5d75",
     justifyContent: "center",
     alignItems: "center",
     gap: 10,
