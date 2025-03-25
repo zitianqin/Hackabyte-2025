@@ -71,6 +71,7 @@ export default function AccountScreen() {
     deliveryNotifications: true,
     promotionalNotifications: false,
   });
+  const [helpModal, setHelpModal] = useState(false);
 
   const handleSectionPress = (section: string) => {
     setActiveSection(section);
@@ -92,9 +93,14 @@ export default function AccountScreen() {
     setNotificationModal(!notificationModal);
   };
 
+  const openHelpModal = () => {
+    setHelpModal(!helpModal);
+  };
+
   const handleSaveChanges = () => {
     setEditProfileModal(false);
     setNotificationModal(false);
+    setHelpModal(false);
   };
 
   const changeNotificationSettings = (type: "deliveryNotifications" | "promotionalNotifications") => {
@@ -279,7 +285,7 @@ export default function AccountScreen() {
                 <Ionicons name="chevron-forward" size={20} color="#ccc" />
               </Pressable>
 
-              <Pressable style={styles.settingRow}>
+              <Pressable style={styles.settingRow} onPress={openHelpModal}>
                 <Ionicons name="help-circle-outline" size={22} color="#e97e67" style={styles.settingIcon} />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>Help & Support</Text>
@@ -383,6 +389,37 @@ export default function AccountScreen() {
               </Pressable>
               <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
                 <Text style={styles.buttonText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Help settings */}
+      <Modal visible={helpModal} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Help Center</Text>
+            {/* Conact Us */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Contact Us</Text>
+              <View style={styles.helpCard}>
+                <Text style={styles.helpCardTitle}>Call Us</Text>
+                <Text style={styles.helpCardDescription}>XXXX-XXX-XXX</Text>
+                <Text style={styles.helpCardDescription}>
+                  8am–6pm, Monday–Friday (except national public holidays).
+                </Text>
+              </View>
+              <View style={styles.helpCard}>
+                <Text style={styles.helpCardTitle}>Enquire Online</Text>
+                <Text style={styles.helpCardDescription}>fatcow@gmail.com</Text>
+                <Text style={styles.helpCardDescription}>Tell us the important details and we'll be in touch.</Text>
+              </View>
+            </View>
+
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.cancelButton} onPress={openHelpModal}>
+                <Text style={styles.buttonText}>Close</Text>
               </Pressable>
             </View>
           </View>
@@ -712,5 +749,21 @@ const styles = StyleSheet.create({
   type: {
     flexDirection: "row",
     gap: 20,
+  },
+  helpCard: {
+    backgroundColor: "#292f38",
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 8,
+    gap: 10,
+  },
+  helpCardTitle: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  helpCardDescription: {
+    fontSize: 13,
+    color: "#fff",
   },
 });
