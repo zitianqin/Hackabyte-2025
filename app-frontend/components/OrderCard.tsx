@@ -34,16 +34,13 @@ export default function OrderCard({ order }: OrderCardProps) {
 
   // Format date to be more readable
   const orderDate = new Date(order.createdAt);
-  const formattedDate = `${orderDate.toLocaleDateString()} at ${orderDate.toLocaleTimeString(
-    [],
-    { hour: "2-digit", minute: "2-digit" }
-  )}`;
+  const formattedDate = `${orderDate.toLocaleDateString()} at ${orderDate.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
 
   return (
-    <Pressable
-      style={styles.card}
-      onPress={() => router.push(`/order/${order.id}`)}
-    >
+    <Pressable style={styles.card} onPress={() => router.push(`/order/${order.id}`)}>
       <View style={styles.header}>
         <Text style={styles.restaurant}>{order.restaurantName}</Text>
         <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
@@ -53,7 +50,7 @@ export default function OrderCard({ order }: OrderCardProps) {
 
       <View style={styles.itemsList}>
         {order.items.map((item, index) => (
-          <Text key={item.id} style={styles.item}>
+          <Text key={index} style={styles.item}>
             {item.quantity}x {item.name} - ${item.price.toFixed(2)}
           </Text>
         ))}
@@ -73,9 +70,7 @@ export default function OrderCard({ order }: OrderCardProps) {
         {order.estimatedDeliveryTime && (
           <View style={styles.infoRow}>
             <Ionicons name="time-outline" size={16} color="#ccc" />
-            <Text style={styles.infoText}>
-              ETA: {order.estimatedDeliveryTime}
-            </Text>
+            <Text style={styles.infoText}>ETA: {order.estimatedDeliveryTime}</Text>
           </View>
         )}
 

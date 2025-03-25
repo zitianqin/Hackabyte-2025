@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  ActivityIndicator,
-  Dimensions,
-} from "react-native";
+import { Text, View, StyleSheet, ScrollView, TextInput, ActivityIndicator, Dimensions } from "react-native";
 import { getAllRestaurants, Restaurant } from "@/services/api";
 import RestaurantCard from "@/components/RestaurantCard";
 import { Ionicons } from "@expo/vector-icons";
@@ -52,12 +44,7 @@ export default function SearchScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <Ionicons
-          name="search"
-          size={24}
-          color="#ccc"
-          style={styles.searchIcon}
-        />
+        <Ionicons name="search" size={24} color="#ccc" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search for restaurants or locations..."
@@ -79,9 +66,7 @@ export default function SearchScreen() {
         ) : (
           <View style={styles.emptyContainer}>
             <Ionicons name="restaurant-outline" size={64} color="#4f5d75" />
-            <Text style={styles.emptyText}>
-              No restaurants found matching "{searchQuery}"
-            </Text>
+            <Text style={styles.emptyText}>No restaurants found matching "{searchQuery}"</Text>
           </View>
         )}
       </ScrollView>
@@ -133,7 +118,7 @@ const styles = StyleSheet.create({
   restaurantsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   emptyContainer: {
     alignItems: "center",

@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   restaurantsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   viewAllButton: {
     backgroundColor: "transparent",
