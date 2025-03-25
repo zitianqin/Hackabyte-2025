@@ -71,6 +71,8 @@ export default function AccountScreen() {
     deliveryNotifications: true,
     promotionalNotifications: false,
   });
+  const [isPrivateProfile, setIsPrivateProfile] = useState(false); // State to track profile visibility
+  const [privacyModal, setPrivacyModal] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
 
   const handleSectionPress = (section: string) => {
@@ -93,6 +95,10 @@ export default function AccountScreen() {
     setNotificationModal(!notificationModal);
   };
 
+  const openPrivacyModal = () => {
+    setPrivacyModal(!privacyModal);
+  };
+
   const openHelpModal = () => {
     setHelpModal(!helpModal);
   };
@@ -100,6 +106,7 @@ export default function AccountScreen() {
   const handleSaveChanges = () => {
     setEditProfileModal(false);
     setNotificationModal(false);
+    setPrivacyModal(false);
     setHelpModal(false);
   };
 
@@ -108,6 +115,10 @@ export default function AccountScreen() {
       ...notificationSettings,
       [type]: !notificationSettings[type],
     });
+  };
+
+  const handleProfileToggle = () => {
+    setIsPrivateProfile(!isPrivateProfile);
   };
 
   return (
@@ -276,7 +287,7 @@ export default function AccountScreen() {
                 <Ionicons name="chevron-forward" size={20} color="#ccc" />
               </Pressable>
 
-              <Pressable style={styles.settingRow}>
+              <Pressable style={styles.settingRow} onPress={openPrivacyModal}>
                 <Ionicons name="lock-closed-outline" size={22} color="#e97e67" style={styles.settingIcon} />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>Privacy</Text>
@@ -385,6 +396,37 @@ export default function AccountScreen() {
 
             <View style={styles.modalButtons}>
               <Pressable style={styles.cancelButton} onPress={openNotificationModal}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
+              <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
+                <Text style={styles.buttonText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Privacy settings */}
+      <Modal visible={privacyModal} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Privacy and Data Center</Text>
+
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Privacy Settings</Text>
+              <View style={styles.profileRow}>
+                <Text style={styles.settingTitle}>Profile Visibility</Text>
+                <Switch
+                  value={isPrivateProfile}
+                  onValueChange={handleProfileToggle}
+                  trackColor={{ false: "#4f5d75", true: "#e97e67" }}
+                  thumbColor="#fff"
+                />
+              </View>
+            </View>
+
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.cancelButton} onPress={openPrivacyModal}>
                 <Text style={styles.buttonText}>Cancel</Text>
               </Pressable>
               <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
@@ -748,6 +790,11 @@ const styles = StyleSheet.create({
   },
   type: {
     flexDirection: "row",
+    gap: 20,
+  },
+  profileRow: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: 20,
   },
   helpCard: {

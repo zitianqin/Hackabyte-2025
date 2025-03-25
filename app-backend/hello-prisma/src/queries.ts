@@ -1,100 +1,91 @@
-import { PrismaClient } from '@prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient()
-  .$extends(withAccelerate());
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 // A `main` function so that we can use async/await
 async function main() {
-  const user1Email = `alice${Date.now()}@prisma.io`;
-  const user2Email = `bob${Date.now()}@prisma.io`;
-
-  // Seed the database with users and posts
-  const user1 = await prisma.user.create({
+  // Create a restaurant
+  const restaurant = await prisma.restaurant.create({
     data: {
-      email: user1Email,
-      name: 'Alice',
-      posts: {
-        create: {
-          title: 'Join the Prisma community on Discord',
-          content: 'https://pris.ly/discord',
-          published: true,
-        },
-      },
-    },
-    include: {
-      posts: true,
+      name: "Pizza Palace",
+      description: "Best pizza in town!",
     },
   });
-  const user2 = await prisma.user.create({
+  console.log(`Created restaurant: ${restaurant.name}`);
+
+  // Create a user
+  const user = await prisma.user.create({
     data: {
-      email: user2Email,
-      name: 'Bob',
-      posts: {
-        create: [
-          {
-            title: 'Check out Prisma on YouTube',
-            content: 'https://pris.ly/youtube',
-            published: true,
-          },
-          {
-            title: 'Follow Prisma on Twitter',
-            content: 'https://twitter.com/prisma/',
-            published: false,
-          },
-        ],
-      },
+      email: `user${Date.now()}@example.com`,
+      name: "John Doe",
+      password: "hashedPassword123", // In real app, this should be properly hashed
+    },
+  });
+  console.log(`Created user: ${user.name}`);
+
+  // Create an order
+  const order = await prisma.order.create({
+    data: {
+      price: 25.99,
+      userId: user.id,
+      restaurantId: restaurant.id,
     },
     include: {
-      posts: true,
+      user: true,
+      restaurant: true,
+    },
+  });
+  console.log(`Created order: ${JSON.stringify(order)}`);
+
+  // Get all orders for a restaurant
+  const restaurantOrders = await prisma.order.findMany({
+    where: {
+      restaurantId: restaurant.id,
+    },
+    include: {
+      user: true,
     },
   });
   console.log(
-    `Created users: ${user1.name} (${user1.posts.length} post) and ${user2.name} (${user2.posts.length} posts) `
+    `All orders for ${restaurant.name}: ${JSON.stringify(restaurantOrders)}`
   );
 
-  // Retrieve all published posts
-  const allPosts = await prisma.post.findMany({
-    where: { published: true },
-  });
-  console.log(`Retrieved all published posts: ${JSON.stringify(allPosts)}`);
-
-  // Create a new post (written by an already existing user with email alice@prisma.io)
-  const newPost = await prisma.post.create({
-    data: {
-      title: 'Join the Prisma Discord community',
-      content: 'https://pris.ly/discord',
-      published: false,
-      author: {
-        connect: {
-          email: user1Email,
-        },
-      },
-    },
-  });
-  console.log(`Created a new post: ${JSON.stringify(newPost)}`);
-
-  // Publish the new post
-  const updatedPost = await prisma.post.update({
+  // Get all orders for a user
+  const userOrders = await prisma.order.findMany({
     where: {
-      id: newPost.id,
+      userId: user.id,
     },
-    data: {
-      published: true,
+    include: {
+      restaurant: true,
     },
   });
-  console.log(`Published the newly created post: ${JSON.stringify(updatedPost)}`);
+  console.log(`All orders for ${user.name}: ${JSON.stringify(userOrders)}`);
 
-  // Retrieve all posts by user with email alice@prisma.io
-  const postsByUser = await prisma.post
-    .findMany({
-      where: {
-        author: {
-          email: user1Email
-        }
-      },
-    });
-  console.log(`Retrieved all posts from a specific user: ${JSON.stringify(postsByUser)}`);
+  // Update order status to delivered
+  const updatedOrder = await prisma.order.update({
+    where: {
+      id: order.id,
+    },
+    data: {
+      delivered: true,
+    },
+  });
+  console.log(
+    `Updated order status to delivered: ${JSON.stringify(updatedOrder)}`
+  );
+
+  // Get all delivered orders
+  const deliveredOrders = await prisma.order.findMany({
+    where: {
+      delivered: true,
+    },
+    include: {
+      user: true,
+      restaurant: true,
+    },
+  });
+  console.log(`All delivered orders: ${JSON.stringify(deliveredOrders)}`);
 }
 
 main()
