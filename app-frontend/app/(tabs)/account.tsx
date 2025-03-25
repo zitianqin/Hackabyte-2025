@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Pressable, ScrollView, Switch } from "react-native";
+import { Text, View, StyleSheet, Pressable, ScrollView, Switch, TextInput, Modal } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -49,6 +49,21 @@ export default function AccountScreen() {
         status: "cancelled",
       },
     ],
+  };
+
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [editedData, setEditedData] = useState(userData);
+
+  const handleInputChange = (field: string, value: string) => {
+    setEditedData({ ...editedData, [field]: value });
+  };
+
+  const handleSaveChanges = () => {
+    setModalVisible(false);
+  };
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
   };
 
   return (
@@ -129,7 +144,7 @@ export default function AccountScreen() {
               </View>
             </View>
 
-            <Pressable style={styles.editButton}>
+            <Pressable style={styles.editButton} onPress={toggleModal}>
               <Text style={styles.editButtonText}>Edit Profile</Text>
             </Pressable>
           </View>
@@ -243,6 +258,41 @@ export default function AccountScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Edit Profile */}
+      <Modal visible={isModalVisible} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Profile</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              value={editedData.name}
+              onChangeText={(text) => handleInputChange("name", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email Address"
+              value={editedData.email}
+              onChangeText={(text) => handleInputChange("email", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              value={editedData.phone}
+              onChangeText={(text) => handleInputChange("phone", text)}
+            />
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
+              <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
+                <Text style={styles.buttonText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -364,7 +414,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 14,
     alignItems: "center",
-    marginTop: 16,
+    marginTop: 5,
   },
   editButtonText: {
     color: "#fff",
@@ -486,5 +536,55 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 15,
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#3b4957",
+    borderRadius: 12,
+    padding: 30,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  input: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+    color: "grey",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  cancelButton: {
+    backgroundColor: "#25292e",
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 5,
+  },
+  saveButton: {
+    backgroundColor: "#e97e67",
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
