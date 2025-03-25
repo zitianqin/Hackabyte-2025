@@ -4,9 +4,73 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAppContext } from "@/services/AppContext";
 
+// Mock data
+const userData = {
+  name: "John Smith",
+  email: "john.smith@student.unsw.edu.au",
+  phone: "0412 345 678",
+  location: "Upper Campus, UNSW Sydney",
+  memberSince: "March 2025",
+  orders: [
+    {
+      id: "1234",
+      restaurant: "Yallah",
+      items: "HSP with extra sauce",
+      date: "24 March 2025",
+      price: "$18.50",
+      status: "delivered",
+    },
+    {
+      id: "1235",
+      restaurant: "Tropical Green",
+      items: "Pho with chicken",
+      date: "23 March 2025",
+      price: "$14.90",
+      status: "delivered",
+    },
+    {
+      id: "1236",
+      restaurant: "Soul Origin",
+      items: "Turkey & Cranberry Sandwich",
+      date: "20 March 2025",
+      price: "$9.90",
+      status: "cancelled",
+    },
+  ],
+};
+
+const notifications = [
+  {
+    id: "1",
+    title: "Order Delivered",
+    date: "24 March 2025",
+    description: "Your HSP with extra sauce has been delivered.",
+  },
+  {
+    id: "2",
+    title: "Order Cancelled",
+    date: "23 March 2025",
+    description: "Your Pho with chicken order was cancelled.",
+  },
+  {
+    id: "3",
+    title: "New Promotion",
+    date: "20 March 2025",
+    description: "Lunch is on us! 20% off your next order at Yallah!",
+  },
+];
+
 export default function AccountScreen() {
   const [activeSection, setActiveSection] = useState("personal");
   const { appMode, setAppMode } = useAppContext();
+
+  const [editProfileModal, setEditProfileModal] = useState(false);
+  const [editedData, setEditedData] = useState(userData);
+  const [notificationModal, setNotificationModal] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState({
+    deliveryNotifications: true,
+    promotionalNotifications: false,
+  });
 
   const handleSectionPress = (section: string) => {
     setActiveSection(section);
@@ -16,54 +80,28 @@ export default function AccountScreen() {
     setAppMode(appMode === "customer" ? "worker" : "customer");
   };
 
-  // Mock user data
-  const userData = {
-    name: "John Smith",
-    email: "john.smith@student.unsw.edu.au",
-    phone: "0412 345 678",
-    location: "Upper Campus, UNSW Sydney",
-    memberSince: "March 2025",
-    orders: [
-      {
-        id: "1234",
-        restaurant: "Yallah",
-        items: "HSP with extra sauce",
-        date: "24 March 2025",
-        price: "$18.50",
-        status: "delivered",
-      },
-      {
-        id: "1235",
-        restaurant: "Tropical Green",
-        items: "Pho with chicken",
-        date: "23 March 2025",
-        price: "$14.90",
-        status: "delivered",
-      },
-      {
-        id: "1236",
-        restaurant: "Soul Origin",
-        items: "Turkey & Cranberry Sandwich",
-        date: "20 March 2025",
-        price: "$9.90",
-        status: "cancelled",
-      },
-    ],
-  };
-
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [editedData, setEditedData] = useState(userData);
-
   const handleInputChange = (field: string, value: string) => {
     setEditedData({ ...editedData, [field]: value });
   };
 
-  const handleSaveChanges = () => {
-    setModalVisible(false);
+  const openEditProfileModal = () => {
+    setEditProfileModal(!editProfileModal);
   };
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+  const openNotificationModal = () => {
+    setNotificationModal(!notificationModal);
+  };
+
+  const handleSaveChanges = () => {
+    setEditProfileModal(false);
+    setNotificationModal(false);
+  };
+
+  const changeNotificationSettings = (type: "deliveryNotifications" | "promotionalNotifications") => {
+    setNotificationSettings({
+      ...notificationSettings,
+      [type]: !notificationSettings[type],
+    });
   };
 
   return (
@@ -144,7 +182,7 @@ export default function AccountScreen() {
               </View>
             </View>
 
-            <Pressable style={styles.editButton} onPress={toggleModal}>
+            <Pressable style={styles.editButton} onPress={openEditProfileModal}>
               <Text style={styles.editButtonText}>Edit Profile</Text>
             </Pressable>
           </View>
@@ -214,7 +252,7 @@ export default function AccountScreen() {
                 />
               </View>
 
-              <Pressable style={styles.settingRow}>
+              <Pressable style={styles.settingRow} onPress={openNotificationModal}>
                 <Ionicons name="notifications-outline" size={22} color="#e97e67" style={styles.settingIcon} />
                 <View style={styles.settingTextContainer}>
                   <Text style={styles.settingTitle}>Notifications</Text>
@@ -260,7 +298,7 @@ export default function AccountScreen() {
       </ScrollView>
 
       {/* Edit Profile */}
-      <Modal visible={isModalVisible} transparent animationType="fade">
+      <Modal visible={editProfileModal} transparent animationType="fade">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Edit Profile</Text>
@@ -283,7 +321,64 @@ export default function AccountScreen() {
               onChangeText={(text) => handleInputChange("phone", text)}
             />
             <View style={styles.modalButtons}>
-              <Pressable style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+              <Pressable style={styles.cancelButton} onPress={() => setEditProfileModal(false)}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
+              <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
+                <Text style={styles.buttonText}>Save</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Update notification settings */}
+      <Modal visible={notificationModal} transparent animationType="fade">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Notifications</Text>
+
+            {/* Notification History */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Notification History</Text>
+              <ScrollView style={styles.notificationHistoryContainer}>
+                {notifications.map((notification) => (
+                  <View key={notification.id} style={styles.notificationCard}>
+                    <Text style={styles.notificationTitle}>{notification.title}</Text>
+                    <Text style={styles.notificationDate}>{notification.date}</Text>
+                    <Text style={styles.notificationDescription}>{notification.description}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Notification Settings */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Notification Settings</Text>
+              <View style={styles.notifRow}>
+                <View style={styles.type}>
+                  <Text style={styles.settingTitle}>Delivery Notifications</Text>
+                  <Switch
+                    value={notificationSettings.deliveryNotifications}
+                    onValueChange={() => changeNotificationSettings("deliveryNotifications")}
+                    trackColor={{ false: "#4f5d75", true: "#e97e67" }}
+                    thumbColor="#fff"
+                  />
+                </View>
+                <View style={styles.type}>
+                  <Text style={styles.settingTitle}>Promotional Notifications</Text>
+                  <Switch
+                    value={notificationSettings.promotionalNotifications}
+                    onValueChange={() => changeNotificationSettings("promotionalNotifications")}
+                    trackColor={{ false: "#4f5d75", true: "#e97e67" }}
+                    thumbColor="#fff"
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.cancelButton} onPress={openNotificationModal}>
                 <Text style={styles.buttonText}>Cancel</Text>
               </Pressable>
               <Pressable style={styles.saveButton} onPress={handleSaveChanges}>
@@ -586,5 +681,36 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  notificationHistoryContainer: {
+    maxHeight: 200,
+  },
+  notificationCard: {
+    backgroundColor: "#292f38",
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 8,
+  },
+  notificationTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  notificationDate: {
+    fontSize: 12,
+    color: "#ccc",
+  },
+  notificationDescription: {
+    fontSize: 14,
+    color: "#ccc",
+  },
+  notifRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    margin: 10,
+  },
+  type: {
+    flexDirection: "row",
+    gap: 20,
   },
 });
