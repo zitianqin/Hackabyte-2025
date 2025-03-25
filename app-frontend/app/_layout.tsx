@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { AppProvider, useAppContext } from "@/services/AppContext";
 import { View, ActivityIndicator } from "react-native";
+import { router } from "expo-router";
 
 function RootLayoutNav() {
   const { isAuthenticated, isLoading } = useAppContext();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace("/auth");
+    }
+  }, [isLoading, isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -42,10 +49,6 @@ function RootLayoutNav() {
           />
           <Stack.Screen name="order/[id]" options={{ headerShown: true }} />
           <Stack.Screen name="checkout" options={{ headerShown: true }} />
-          <Stack.Screen
-            name="order-confirmation"
-            options={{ headerShown: true }}
-          />
         </>
       )}
     </Stack>

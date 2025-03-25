@@ -1,138 +1,14 @@
-const API_BASE_URL = "http://localhost:3000";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// App mode types and context
-export type AppMode = "customer" | "worker";
+const API_URL = "http://localhost:3000";
 
-// Mock data for available deliveries (for workers)
-export const availableDeliveries: Order[] = [
-  {
-    id: "delivery-1",
-    restaurantId: "rest-3",
-    restaurantName: "Soul Origin",
-    items: [
-      {
-        id: "item-10",
-        menuItemId: "menu-3-0",
-        name: "Chicken Sandwich",
-        quantity: 1,
-        price: 12,
-      },
-      {
-        id: "item-11",
-        menuItemId: "menu-3-1",
-        name: "Water Bottle",
-        quantity: 1,
-        price: 3,
-      },
-    ],
-    status: "pending",
-    total: 15,
-    deliveryLocation: "Engineering Building, Level 2",
-    createdAt: new Date(Date.now() - 10 * 60000).toISOString(),
-    estimatedDeliveryTime: "20-25 mins",
-  },
-  {
-    id: "delivery-2",
-    restaurantId: "rest-7",
-    restaurantName: "Guzman y Gomez",
-    items: [
-      {
-        id: "item-12",
-        menuItemId: "menu-7-0",
-        name: "Burrito Bowl",
-        quantity: 1,
-        price: 16,
-      },
-      {
-        id: "item-13",
-        menuItemId: "menu-7-1",
-        name: "Nachos",
-        quantity: 1,
-        price: 10,
-      },
-    ],
-    status: "pending",
-    total: 26,
-    deliveryLocation: "Law Building, Reception",
-    createdAt: new Date(Date.now() - 15 * 60000).toISOString(),
-    estimatedDeliveryTime: "15-20 mins",
-  },
-];
-
-// Mock active deliveries for workers
-export const workerDeliveries: Order[] = [
-  {
-    id: "worker-delivery-1",
-    restaurantId: "rest-12",
-    restaurantName: "Subway",
-    items: [
-      {
-        id: "item-20",
-        menuItemId: "menu-12-0",
-        name: "Footlong Italian BMT",
-        quantity: 1,
-        price: 14,
-      },
-      {
-        id: "item-21",
-        menuItemId: "menu-12-1",
-        name: "Cookie",
-        quantity: 2,
-        price: 4,
-      },
-    ],
-    status: "picked_up",
-    total: 18,
-    deliveryLocation: "Business School, Level 1",
-    createdAt: new Date(Date.now() - 20 * 60000).toISOString(),
-    estimatedDeliveryTime: "5-10 mins",
-    deliveryPersonId: "worker-1",
-  },
-];
-
-// Mock earnings history for workers
-export interface Earning {
-  id: string;
-  orderId: string;
-  restaurantName: string;
-  amount: number;
-  date: string;
-  status: "completed" | "pending";
-}
-
-export const earningsHistory: Earning[] = [
-  {
-    id: "earning-1",
-    orderId: "order-past-1",
-    restaurantName: "Yallah",
-    amount: 5.5,
-    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "completed",
-  },
-  {
-    id: "earning-2",
-    orderId: "order-past-2",
-    restaurantName: "Subway",
-    amount: 6.0,
-    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "completed",
-  },
-  {
-    id: "earning-3",
-    orderId: "worker-delivery-1",
-    restaurantName: "Subway",
-    amount: 6.5,
-    date: new Date(Date.now() - 20 * 60000).toISOString(),
-    status: "pending",
-  },
-];
-
+// Types
 export interface Restaurant {
   id: string;
   name: string;
   location: string;
-  image: any;
   description?: string;
+  image: any; // Keep local image support for now
   menu?: MenuItem[];
 }
 
@@ -158,302 +34,197 @@ export interface Order {
     | "cancelled";
   total: number;
   deliveryLocation: string;
-  createdAt: string;
-  estimatedDeliveryTime?: string;
   deliveryPersonId?: string;
+  estimatedDeliveryTime?: string;
+  createdAt: string;
 }
 
 export interface OrderItem {
-  id: string;
   menuItemId: string;
   name: string;
-  price: number;
   quantity: number;
+  price: number;
 }
 
-export interface Feedback {
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  phone?: string;
+  location?: string;
+  role: "customer" | "worker";
+  createdAt: string;
+}
+
+export interface Earning {
+  id: string;
   orderId: string;
-  rating: number;
-  comment: string;
+  restaurantName: string;
+  amount: number;
+  status: "pending" | "completed";
+  date: string;
 }
 
-// Mock data for development
-import { UNSWFoodList } from "../components/UNSWFood";
+// API Helper functions
+async function getAuthToken() {
+  return await AsyncStorage.getItem("auth_token");
+}
 
-const restaurants: Restaurant[] = UNSWFoodList.map((food, index) => ({
-  id: `rest-${index}`,
-  name: food.name,
-  location: food.location,
-  image: food.image,
-  description: `${food.name} is a popular eatery on campus offering delicious meals to students and staff.`,
-  menu: Array(Math.floor(Math.random() * 5) + 3)
-    .fill(0)
-    .map((_, i) => ({
-      id: `menu-${index}-${i}`,
-      name: `Item ${i + 1}`,
-      description: `Delicious menu item ${i + 1} from ${food.name}`,
-      price: Math.floor(Math.random() * 15) + 8,
-    })),
-}));
-
-const mockOrders: Order[] = [
-  {
-    id: "order-1",
-    restaurantId: "rest-0",
-    restaurantName: "Arthouse Kitchen Café",
-    items: [
-      {
-        id: "item-1",
-        menuItemId: "menu-0-0",
-        name: "Avocado Toast",
-        quantity: 1,
-        price: 12,
-      },
-      {
-        id: "item-2",
-        menuItemId: "menu-0-1",
-        name: "Flat White",
-        quantity: 1,
-        price: 5,
-      },
-    ],
-    status: "on_the_way",
-    total: 17,
-    deliveryLocation: "Main Library, Level 3",
-    createdAt: new Date(Date.now() - 30 * 60000).toISOString(),
-    estimatedDeliveryTime: "10 mins",
-  },
-  {
-    id: "order-2",
-    restaurantId: "rest-5",
-    restaurantName: "Gradueat",
-    items: [
-      {
-        id: "item-3",
-        menuItemId: "menu-5-0",
-        name: "Chicken Bowl",
-        quantity: 1,
-        price: 15,
-      },
-    ],
-    status: "delivered",
-    total: 15,
-    deliveryLocation: "Computer Science Building, Room 201",
-    createdAt: new Date(Date.now() - 2 * 60 * 60000).toISOString(),
-  },
-  {
-    id: "order-3",
-    restaurantId: "rest-10",
-    restaurantName: "Mamak Village",
-    items: [
-      {
-        id: "item-4",
-        menuItemId: "menu-10-0",
-        name: "Nasi Lemak",
-        quantity: 1,
-        price: 14,
-      },
-      {
-        id: "item-5",
-        menuItemId: "menu-10-1",
-        name: "Teh Tarik",
-        quantity: 2,
-        price: 8,
-      },
-    ],
-    status: "pending",
-    total: 22,
-    deliveryLocation: "Science Theatre",
-    createdAt: new Date().toISOString(),
-    estimatedDeliveryTime: "25 mins",
-  },
-];
-
-// API service functions
-export const getAllRestaurants = async (): Promise<Restaurant[]> => {
-  // In a real app, this would fetch from the API
-  // const response = await fetch(`${API_BASE_URL}/api/restaurants`);
-  // return response.json();
-  return restaurants;
-};
-
-export const getRestaurantById = async (
-  id: string
-): Promise<Restaurant | undefined> => {
-  // In a real app, this would fetch from the API
-  // const response = await fetch(`${API_BASE_URL}/api/restaurants/${id}`);
-  // return response.json();
-  return restaurants.find((r) => r.id === id);
-};
-
-export const getOrders = async (): Promise<Order[]> => {
-  // In a real app, this would fetch from the API
-  // const response = await fetch(`${API_BASE_URL}/api/orders`);
-  // return response.json();
-  return mockOrders;
-};
-
-export const getOrderById = async (
-  orderId: string
-): Promise<Order | undefined> => {
-  // In a real app, this would fetch from the API
-  // const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
-  // return response.json();
-  return mockOrders.find((o) => o.id === orderId);
-};
-
-export const placeOrder = async (
-  order: Omit<Order, "id" | "createdAt" | "status">
-): Promise<Order> => {
-  // In a real app, this would POST to the API
-  // const response = await fetch(`${API_BASE_URL}/api/orders`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(order)
-  // });
-  // return response.json();
-
-  const newOrder: Order = {
-    ...order,
-    id: `order-${Date.now()}`,
-    status: "pending",
-    createdAt: new Date().toISOString(),
-    estimatedDeliveryTime: "25-30 mins",
+async function apiRequest(endpoint: string, options: RequestInit = {}) {
+  const token = await getAuthToken();
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
   };
 
-  mockOrders.push(newOrder);
-  return newOrder;
-};
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
 
-export const updateOrderStatus = async (
-  orderId: string,
-  status: Order["status"]
-): Promise<Order> => {
-  // In a real app, this would PUT to the API
-  // const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
-  //   method: 'PUT',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ status })
-  // });
-  // return response.json();
-
-  const order = mockOrders.find((o) => o.id === orderId);
-  if (!order) {
-    throw new Error("Order not found");
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.statusText}`);
   }
 
-  order.status = status;
-  return order;
-};
+  return response.json();
+}
 
-export const cancelOrder = async (orderId: string): Promise<Order> => {
-  // In a real app, this would PUT to the API
-  // const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}/cancel`, {
-  //   method: 'PUT'
-  // });
-  // return response.json();
+// Auth APIs
+export async function register(email: string, password: string, name: string) {
+  const response = await apiRequest("/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ email, password, name }),
+  });
+  await AsyncStorage.setItem("auth_token", response.token);
+  return response.user;
+}
 
-  return updateOrderStatus(orderId, "cancelled");
-};
+export async function login(email: string, password: string) {
+  const response = await apiRequest("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+  await AsyncStorage.setItem("auth_token", response.token);
+  return response.user;
+}
 
-export const submitFeedback = async (
-  orderId: string,
-  feedback: Feedback
-): Promise<void> => {
-  // In a real app, this would POST to the API
-  // await fetch(`${API_BASE_URL}/api/orders/${orderId}/feedback`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(feedback)
-  // });
+export async function getCurrentUser() {
+  return apiRequest("/auth/me");
+}
 
-  console.log("Feedback submitted:", feedback);
-};
+export async function logout() {
+  await AsyncStorage.removeItem("auth_token");
+}
 
-// Worker-specific API functions
-export const getAvailableDeliveries = async (): Promise<Order[]> => {
-  // In a real app, this would fetch from the API
-  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries/available`);
-  // return response.json();
-
-  return availableDeliveries;
-};
-
-export const getWorkerDeliveries = async (): Promise<Order[]> => {
-  // In a real app, this would fetch from the API
-  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries`);
-  // return response.json();
-
-  return workerDeliveries;
-};
-
-export const acceptDelivery = async (orderId: string): Promise<Order> => {
-  // In a real app, this would POST to the API
-  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries/${orderId}/accept`, {
-  //   method: 'POST'
-  // });
-  // return response.json();
-
-  const order = availableDeliveries.find((o) => o.id === orderId);
-  if (!order) {
-    throw new Error("Order not found");
+// Restaurant APIs
+export async function getAllRestaurants(): Promise<Restaurant[]> {
+  try {
+    return await apiRequest("/api/restaurants");
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+    // Fallback to local data for development
+    return UNSWFoodList.map((food) => ({
+      id: food.name.toLowerCase().replace(/\s+/g, "-"),
+      name: food.name,
+      location: food.location,
+      image: food.image,
+    }));
   }
+}
 
-  // Update order status and add to worker deliveries
-  order.status = "accepted";
-  order.deliveryPersonId = "worker-1"; // Mock worker ID
-  workerDeliveries.push(order);
-
-  // Remove from available deliveries
-  const index = availableDeliveries.findIndex((o) => o.id === orderId);
-  if (index !== -1) {
-    availableDeliveries.splice(index, 1);
-  }
-
-  return order;
-};
-
-export const updateDeliveryStatus = async (
-  orderId: string,
-  status: Order["status"]
-): Promise<Order> => {
-  // In a real app, this would PUT to the API
-  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries/${orderId}/status`, {
-  //   method: 'PUT',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ status })
-  // });
-  // return response.json();
-
-  // Find the order in worker deliveries
-  const order = workerDeliveries.find((o) => o.id === orderId);
-  if (!order) {
-    throw new Error("Delivery not found");
-  }
-
-  order.status = status;
-
-  // If delivered, add to earnings
-  if (status === "delivered") {
-    const earning: Earning = {
-      id: `earning-${Date.now()}`,
-      orderId: order.id,
-      restaurantName: order.restaurantName,
-      amount: parseFloat((order.total * 0.3).toFixed(2)), // 30% of order total as earnings
-      date: new Date().toISOString(),
-      status: "pending",
+export async function getRestaurantById(
+  id: string
+): Promise<Restaurant | null> {
+  try {
+    return await apiRequest(`/api/restaurants/${id}`);
+  } catch (error) {
+    console.error("Error fetching restaurant:", error);
+    // Fallback to local data for development
+    const restaurant = UNSWFoodList.find(
+      (food) => food.name.toLowerCase().replace(/\s+/g, "-") === id
+    );
+    if (!restaurant) return null;
+    return {
+      id,
+      name: restaurant.name,
+      location: restaurant.location,
+      image: restaurant.image,
+      menu: [
+        {
+          id: "1",
+          name: "Sample Item 1",
+          description: "A delicious sample item",
+          price: 10.99,
+        },
+        {
+          id: "2",
+          name: "Sample Item 2",
+          description: "Another tasty option",
+          price: 12.99,
+        },
+      ],
     };
-
-    earningsHistory.push(earning);
   }
+}
 
-  return order;
-};
+// Order APIs
+export async function getOrders(): Promise<Order[]> {
+  return apiRequest("/api/orders");
+}
 
-export const getEarningsHistory = async (): Promise<Earning[]> => {
-  // In a real app, this would fetch from the API
-  // const response = await fetch(`${API_BASE_URL}/api/worker/earnings`);
-  // return response.json();
+export async function getOrderById(id: string): Promise<Order | null> {
+  return apiRequest(`/api/orders/${id}`);
+}
 
-  return earningsHistory;
-};
+export async function placeOrder(order: {
+  restaurantId: string;
+  items: { menuItemId: string; quantity: number }[];
+  deliveryLocation: string;
+}): Promise<Order> {
+  return apiRequest("/api/orders", {
+    method: "POST",
+    body: JSON.stringify(order),
+  });
+}
+
+export async function updateOrderStatus(
+  orderId: string,
+  status: Order["status"]
+) {
+  return apiRequest(`/api/orders/${orderId}/status`, {
+    method: "PUT",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export async function submitFeedback(
+  orderId: string,
+  feedback: {
+    rating: number;
+    comment?: string;
+  }
+) {
+  return apiRequest(`/api/orders/${orderId}/feedback`, {
+    method: "POST",
+    body: JSON.stringify(feedback),
+  });
+}
+
+// Worker APIs
+export async function getWorkerDeliveries(): Promise<Order[]> {
+  return apiRequest("/api/worker/deliveries");
+}
+
+export async function acceptDelivery(orderId: string): Promise<Order> {
+  return apiRequest(`/api/worker/deliveries/${orderId}/accept`, {
+    method: "POST",
+  });
+}
+
+export async function getEarningsHistory(): Promise<Earning[]> {
+  return apiRequest("/api/worker/earnings");
+}
+
+// Local data for development fallback
+import { UNSWFoodList } from "@/components/UNSWFood";
