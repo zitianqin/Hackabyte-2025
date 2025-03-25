@@ -1,13 +1,15 @@
-import { Text, View, StyleSheet, Image, ScrollView, TextInput } from "react-native";
+import { Text, View, StyleSheet, Image, ScrollView, TextInput, Dimensions } from "react-native";
 import { UNSWFoodList } from "../../components/UNSWFood";
 import React from "react";
+
+const screenWidth = Dimensions.get("window").width;
 
 export default function SearchScreen() {
   const [search, setSearch] = React.useState("");
   const filteredOptions = UNSWFoodList.filter((f) => f.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={styles.container}>
       <View style={styles.row}>
         <Text style={styles.heading}>Explore Food On Campus</Text>
         <TextInput
@@ -17,17 +19,17 @@ export default function SearchScreen() {
           value={search}
           onChangeText={setSearch}
         />
-        <View style={styles.cardsList}>
-          {filteredOptions.map((c, index) => (
-            <View key={index} style={styles.card}>
-              <Text style={styles.cardTitle}>{c.name}</Text>
-              <Text style={styles.cardDescription}>Location: {c.location}</Text>
-              <Image source={c.image} style={styles.cardImage} resizeMode="cover" />
-            </View>
-          ))}
-        </View>
       </View>
-    </ScrollView>
+      <ScrollView contentContainerStyle={styles.cardsList} showsVerticalScrollIndicator={false}>
+        {filteredOptions.map((c, index) => (
+          <View key={index} style={styles.card}>
+            <Text style={styles.cardTitle}>{c.name}</Text>
+            <Text style={styles.cardDescription}>Location: {c.location}</Text>
+            <Image source={c.image} style={styles.cardImage} resizeMode="contain" />
+          </View>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -35,7 +37,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#292f38",
-    color: "#fff",
     padding: 20,
   },
   searchBar: {
@@ -66,12 +67,12 @@ const styles = StyleSheet.create({
   cardsList: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    marginTop: 20,
+    gap: 10,
   },
   card: {
-    minHeight: 100,
-    minWidth: 150,
-    flexGrow: 1,
+    width: screenWidth < 600 ? "100%" : "auto",
     flexDirection: "column",
     borderRadius: 20,
     backgroundColor: "#4f5d75",
@@ -79,14 +80,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     padding: 25,
-    margin: 15,
+    marginBottom: 15,
   },
   cardTitle: {
     fontSize: 16,
-    color: "#fff",
-  },
-  cardIcon: {
-    fontSize: 36,
     color: "#fff",
   },
   cardDescription: {
