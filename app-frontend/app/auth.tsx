@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: "#fff",
+    color: "#fafafa",
     fontSize: 16,
     marginBottom: 8,
   },
@@ -184,6 +184,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#4f5d75",
   },
   error: {
     color: "#ff4444",
@@ -191,7 +193,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#e97e67",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   switchText: {
-    color: "#007AFF",
+    color: "#e97e67",
     fontSize: 16,
   },
 });
