@@ -6,7 +6,6 @@ const prisma = new PrismaClient()
 
 // A `main` function so that we can use async/await
 async function main() {
-
   const user1Email = `alice${Date.now()}@prisma.io`;
   const user2Email = `bob${Date.now()}@prisma.io`;
 
@@ -51,7 +50,7 @@ async function main() {
     },
   });
   console.log(
-    `Created users: ${user1.name} (${user1.posts.length} post) and ${user2.name} (${user2.posts.length} posts) `,
+    `Created users: ${user1.name} (${user1.posts.length} post) and ${user2.name} (${user2.posts.length} posts) `
   );
 
   // Retrieve all published posts
@@ -96,7 +95,6 @@ async function main() {
       },
     });
   console.log(`Retrieved all posts from a specific user: ${JSON.stringify(postsByUser)}`);
-
 }
 
 main()

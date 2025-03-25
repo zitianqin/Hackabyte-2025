@@ -94,6 +94,20 @@ paths:
       security:
         - BearerAuth: []
 
+  /api/restaurants:
+    get:
+      summary: Get restaurants
+      description: Retrieves a list of available restaurants
+      security:
+        - BearerAuth: []
+
+  /api/restaurants/{restaurantId}:
+    get:
+      summary: Get restaurant details
+      description: Retrieves details for a specific restaurant
+      security:
+        - BearerAuth: []
+
 components:
   securitySchemes:
     BearerAuth:
