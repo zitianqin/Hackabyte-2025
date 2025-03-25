@@ -1,5 +1,4 @@
 import * as argon2 from "argon2";
-import { randomBytes } from "crypto";
 import { prisma } from "../index";
 import { VALIDATION_LIMITS, sanitizeString } from "../lib/validation";
 import {
@@ -8,8 +7,6 @@ import {
   validateSessionToken,
   invalidateSession,
 } from "../lucia-auth/session";
-import { sendEmail } from "../lib/email";
-import { generateToken } from "../lib/tokens";
 
 function validatePassword(password: string): {
   isValid: boolean;
@@ -107,98 +104,4 @@ export async function getCurrentUser(userId: number) {
   });
   if (!user) throw new Error("User not found");
   return user;
-}
-
-export async function changePassword(
-  userId: number,
-  currentPassword: string,
-  newPassword: string
-) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) throw new Error("User not found");
-
-  const isValid = await argon2.verify(user.password, currentPassword);
-  if (!isValid) throw new Error("Current password is incorrect");
-
-  const { isValid: newPasswordValid, message } = validatePassword(newPassword);
-  if (!newPasswordValid) {
-    throw new Error(message);
-  }
-
-  const hashedNewPassword = await argon2.hash(newPassword);
-
-  // Delete all sessions for this user
-  await prisma.session.deleteMany({
-    where: { userId: userId },
-  });
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedNewPassword },
-  });
-}
-
-// Add these new functions
-export async function requestPasswordReset(email: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user)
-    throw new Error(
-      "If an account exists with this email, a reset link will be sent"
-    );
-
-  const resetToken = generateToken();
-  const resetTokenExpiry = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      resetToken,
-      resetTokenExpiry,
-    },
-  });
-
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-  await sendEmail({
-    to: email,
-    subject: "Reset Your FlowmoTime Password",
-    html: `
-      <p>Hello,</p>
-      <p>Someone requested a password reset for your FlowmoTime account.</p>
-      <p>Click <a href="${resetLink}">here</a> to reset your password. This link will expire in 1 hour.</p>
-      <p>If you didn't request this, you can safely ignore this email.</p>
-    `,
-  });
-
-  return {
-    message: "If an account exists with this email, a reset link will be sent",
-  };
-}
-
-export async function resetPassword(token: string, newPassword: string) {
-  const user = await prisma.user.findFirst({
-    where: {
-      resetToken: token,
-      resetTokenExpiry: {
-        gt: new Date(),
-      },
-    },
-  });
-
-  if (!user) throw new Error("Invalid or expired reset token");
-
-  const { isValid, message } = validatePassword(newPassword);
-  if (!isValid) throw new Error(message);
-
-  const hashedPassword = await argon2.hash(newPassword);
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      password: hashedPassword,
-      resetToken: null,
-      resetTokenExpiry: null,
-    },
-  });
-
-  return { message: "Password reset successfully" };
 }

@@ -7,10 +7,9 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
-  Modal,
 } from "react-native";
-import { Stack, router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Stack } from "expo-router";
+import { useAppContext } from "@/services/AppContext";
 
 export default function AuthScreen() {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,6 +22,8 @@ export default function AuthScreen() {
     password: "",
     name: "",
   });
+
+  const { login, register } = useAppContext();
 
   const validateForm = () => {
     const newErrors = {
@@ -57,24 +58,15 @@ export default function AuthScreen() {
     setLoading(true);
 
     try {
-      // TODO: Implement actual authentication logic
       if (isLogin) {
-        // Login logic
-        console.log("Logging in...");
+        await login(email, password);
       } else {
-        // Signup logic
-        console.log("Signing up...");
+        await register(email, password, name);
       }
-
-      // On successful auth, navigate to home
-      router.replace("/(tabs)");
     } catch (error) {
-      console.error("Auth error:", error);
-      Alert.alert(
-        "Authentication Failed",
-        "There was a problem with your request. Please try again.",
-        [{ text: "OK" }]
-      );
+      const message =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      Alert.alert("Authentication Failed", message, [{ text: "OK" }]);
     } finally {
       setLoading(false);
     }
@@ -182,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    color: "#fff",
+    color: "#fafafa",
     fontSize: 16,
     marginBottom: 8,
   },
@@ -192,6 +184,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#4f5d75",
   },
   error: {
     color: "#ff4444",
@@ -199,7 +193,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#e97e67",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
@@ -218,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   switchText: {
-    color: "#007AFF",
+    color: "#e97e67",
     fontSize: 16,
   },
 });

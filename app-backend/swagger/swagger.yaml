@@ -1,119 +1,351 @@
 openapi: 3.0.0
 info:
-  title: Campus Delivery API
-  description: MVP API for a university campus food delivery service
+  title: Fat Cow API
   version: 1.0.0
+  description: API for the Fat Cow food delivery application
 
-paths:
-  /api/users/me:
-    get:
-      summary: Get current user profile
-      description: Retrieves the authenticated user's profile from Clerk
-      security:
-        - BearerAuth: []
-
-    put:
-      summary: Update user profile
-      description: Allows a user to update their profile details
-      security:
-        - BearerAuth: []
-
-  /api/orders:
-    post:
-      summary: Place an order
-      description: Allows a customer to place an order for delivery
-      security:
-        - BearerAuth: []
-
-    get:
-      summary: Get orders
-      description: Customers see their own orders; delivery people see available orders
-      security:
-        - BearerAuth: []
-
-  /api/orders/{orderId}:
-    get:
-      summary: Get order details
-      description: Retrieves details for a specific order
-      security:
-        - BearerAuth: []
-
-  /api/orders/{orderId}/accept:
-    post:
-      summary: Accept an order
-      description: Allows a delivery person to accept an available order
-      security:
-        - BearerAuth: []
-
-  /api/orders/{orderId}/status:
-    put:
-      summary: Update order status
-      description: Allows the delivery person or customer to update order status
-      security:
-        - BearerAuth: []
-
-  /api/orders/{orderId}/confirm:
-    post:
-      summary: Confirm order delivery
-      description: Customer confirms receipt, triggering payment settlement
-      security:
-        - BearerAuth: []
-
-  /api/orders/{orderId}/cancel:
-    put:
-      summary: Cancel an order
-      description: Cancels an order if within allowed conditions
-      security:
-        - BearerAuth: []
-
-  /api/payments/initiate:
-    post:
-      summary: Initiate payment
-      description: Authorizes and holds funds for an order
-      security:
-        - BearerAuth: []
-
-  /api/payments/complete:
-    post:
-      summary: Complete payment
-      description: Processes final payment settlement upon order confirmation
-      security:
-        - BearerAuth: []
-
-  /api/payments/{orderId}:
-    get:
-      summary: Get payment details
-      description: Retrieves payment status for a specific order
-      security:
-        - BearerAuth: []
-
-  /api/orders/{orderId}/feedback:
-    post:
-      summary: Submit feedback
-      description: Allows users to leave feedback after order completion
-      security:
-        - BearerAuth: []
-
-  /api/restaurants:
-    get:
-      summary: Get restaurants
-      description: Retrieves a list of available restaurants
-      security:
-        - BearerAuth: []
-
-  /api/restaurants/{restaurantId}:
-    get:
-      summary: Get restaurant details
-      description: Retrieves details for a specific restaurant
-      security:
-        - BearerAuth: []
+servers:
+  - url: http://localhost:3000
+    description: Development server
 
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT
 
-security:
-  - BearerAuth: []
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        email: { type: string }
+        name: { type: string }
+        phone: { type: string }
+        location: { type: string }
+        role: { type: string, enum: [customer, worker] }
+        createdAt: { type: string, format: date-time }
+
+    Restaurant:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        location: { type: string }
+        description: { type: string }
+        image: { type: string }
+        menu:
+          type: array
+          items:
+            $ref: "#/components/schemas/MenuItem"
+
+    MenuItem:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        price: { type: number }
+        image: { type: string }
+
+    Order:
+      type: object
+      properties:
+        id: { type: string }
+        restaurantId: { type: string }
+        restaurantName: { type: string }
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        status:
+          type: string
+          enum: [pending, accepted, picked_up, on_the_way, delivered, cancelled]
+        total: { type: number }
+        deliveryLocation: { type: string }
+        deliveryPersonId: { type: string }
+        estimatedDeliveryTime: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    OrderItem:
+      type: object
+      properties:
+        menuItemId: { type: string }
+        name: { type: string }
+        quantity: { type: number }
+        price: { type: number }
+
+    Earning:
+      type: object
+      properties:
+        id: { type: string }
+        orderId: { type: string }
+        restaurantName: { type: string }
+        amount: { type: number }
+        status:
+          type: string
+          enum: [pending, completed]
+        date: { type: string, format: date-time }
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+                name: { type: string }
+      responses:
+        200:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: "#/components/schemas/User" }
+                  token: { type: string }
+
+  /auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: "#/components/schemas/User" }
+                  token: { type: string }
+
+  /auth/me:
+    get:
+      summary: Get current user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /api/restaurants:
+    get:
+      summary: Get all restaurants
+      responses:
+        200:
+          description: List of restaurants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Restaurant"
+
+  /api/restaurants/{id}:
+    get:
+      summary: Get restaurant by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Restaurant details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Restaurant"
+
+  /api/orders:
+    get:
+      summary: Get user's orders
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+    post:
+      summary: Place new order
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                restaurantId: { type: string }
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      menuItemId: { type: string }
+                      quantity: { type: number }
+                deliveryLocation: { type: string }
+      responses:
+        201:
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /api/orders/{id}:
+    get:
+      summary: Get order by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /api/orders/{id}/status:
+    put:
+      summary: Update order status
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    [
+                      pending,
+                      accepted,
+                      picked_up,
+                      on_the_way,
+                      delivered,
+                      cancelled,
+                    ]
+      responses:
+        200:
+          description: Order status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /api/orders/{id}/feedback:
+    post:
+      summary: Submit order feedback
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating: { type: number }
+                comment: { type: string }
+      responses:
+        200:
+          description: Feedback submitted
+
+  /api/worker/deliveries:
+    get:
+      summary: Get worker's active deliveries
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of active deliveries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+  /api/worker/deliveries/{id}/accept:
+    post:
+      summary: Accept delivery
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Delivery accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /api/worker/earnings:
+    get:
+      summary: Get worker's earnings history
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Earnings history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Earning"
