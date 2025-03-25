@@ -1,34 +1,34 @@
-import { PrismaClient } from '@prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient()
-  .$extends(withAccelerate());
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 async function main() {
-
   const startTime = performance.now();
 
-  // Learn more about caching strategies:
-  // https://www.prisma.io/docs/accelerate/caching
-  const cachedUsersWithPosts = await prisma.user.findMany({
+  // Example of caching restaurant orders
+  const cachedRestaurantOrders = await prisma.restaurant.findMany({
     where: {
-      email: { contains: "alice" }
+      name: { contains: "Pizza" },
     },
-    include: { posts: true },
+    include: {
+      orders: {
+        include: {
+          user: true,
+        },
+      },
+    },
     cacheStrategy: {
       swr: 30, // 30 seconds
-      ttl: 60  // 60 seconds
-    }
+      ttl: 60, // 60 seconds
+    },
   });
 
   const endTime = performance.now();
-
-  // Calculate the elapsed time
   const elapsedTime = endTime - startTime;
 
   console.log(`The query took ${elapsedTime}ms.`);
-  console.log(`It returned the following data: \n`, cachedUsersWithPosts);
-
+  console.log(`It returned the following data: \n`, cachedRestaurantOrders);
 }
 
 main()
