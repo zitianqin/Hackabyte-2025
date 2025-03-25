@@ -1,5 +1,5 @@
-import { Text, View, StyleSheet, Pressable, ScrollView } from "react-native";
-import React from "react";
+import { Text, View, StyleSheet, Pressable, ScrollView } from 'react-native';
+import React from 'react';
 
 export default function AccountScreen() {
   const [personalDetails, setPersonalDetails] = React.useState(false);
@@ -7,10 +7,10 @@ export default function AccountScreen() {
   const [settings, setSettings] = React.useState(false);
 
   const options = [
-    { name: "Personal Information", icon: "ℹ" },
-    { name: "Order History", icon: "🧾" },
-    { name: "Notifications", icon: "✉️" },
-    { name: "Settings", icon: "⚙️" },
+    { name: 'Personal Information', icon: 'ℹ' },
+    { name: 'Order History', icon: '🧾' },
+    { name: 'Notifications', icon: '✉️' },
+    { name: 'Settings', icon: '⚙️' },
   ];
 
   const handleButtonClick = (name: string) => {
@@ -18,9 +18,9 @@ export default function AccountScreen() {
     setOrderHistory(false);
     setSettings(false);
 
-    name === "Personal Information" && setPersonalDetails(true);
-    name === "Order History" && setOrderHistory(true);
-    name === "Settings" && setSettings(true);
+    name === 'Personal Information' && setPersonalDetails(true);
+    name === 'Order History' && setOrderHistory(true);
+    name === 'Settings' && setSettings(true);
   };
 
   return (
@@ -115,85 +115,85 @@ export default function AccountScreen() {
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    backgroundColor: "#292f38",
+    backgroundColor: '#292f38',
     paddingVertical: 50,
   },
   scrollContainer: {
     flex: 1,
-    width: "100%",
+    width: '100%',
     paddingHorizontal: 100,
   },
   container: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: 30,
   },
   heading: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    width: "100%",
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    width: '100%',
     marginBottom: 20,
   },
   optionsList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 10,
     borderRadius: 15,
-    backgroundColor: "#3B4957",
-    alignSelf: "center",
+    backgroundColor: '#3B4957',
+    alignSelf: 'center',
     marginBottom: 20,
   },
   optionsButton: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    backgroundColor: "#4F5D75",
+    backgroundColor: '#4F5D75',
     borderRadius: 15,
     gap: 5,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   optionsIcon: {
     fontSize: 12,
-    color: "#fff",
+    color: '#fff',
   },
   optionsType: {
     fontSize: 12,
-    color: "#fff",
+    color: '#fff',
   },
   cardList: {
-    flexDirection: "column",
+    flexDirection: 'column',
     gap: 10,
-    width: "100%",
+    width: '100%',
     paddingBottom: 30,
   },
   card: {
     padding: 20,
-    alignItems: "flex-start",
-    width: "100%",
-    backgroundColor: "white",
+    alignItems: 'flex-start',
+    width: '100%',
+    backgroundColor: 'white',
     borderRadius: 10,
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "#25292e",
+    fontWeight: 'bold',
+    color: '#25292e',
   },
   cardDescription: {
     fontSize: 12,
-    color: "#25292e",
+    color: '#25292e',
   },
   cardAction: {
     fontSize: 12,
-    backgroundColor: "#4F5D75",
+    backgroundColor: '#4F5D75',
     padding: 10,
     borderRadius: 10,
-    color: "#fff",
+    color: '#fff',
   },
   sectionTitle: {
     fontSize: 18,
-    color: "#fff",
+    color: '#fff',
     marginTop: 20,
     marginBottom: 10,
   },

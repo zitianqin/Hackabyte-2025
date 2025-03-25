@@ -1,11 +1,11 @@
-import { Text, View, StyleSheet, Image, ScrollView, TextInput, Dimensions } from "react-native";
-import { UNSWFoodList } from "../../components/UNSWFood";
-import React from "react";
+import { Text, View, StyleSheet, Image, ScrollView, TextInput, Dimensions } from 'react-native';
+import { UNSWFoodList } from '../../components/UNSWFood';
+import React from 'react';
 
-const screenWidth = Dimensions.get("window").width;
+const screenWidth = Dimensions.get('window').width;
 
 export default function SearchScreen() {
-  const [search, setSearch] = React.useState("");
+  const [search, setSearch] = React.useState('');
   const filteredOptions = UNSWFoodList.filter((f) => f.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
@@ -36,62 +36,62 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#292f38",
+    backgroundColor: '#292f38',
     padding: 20,
   },
   searchBar: {
-    width: "75%",
-    backgroundColor: "#3b4957",
+    width: '75%',
+    backgroundColor: '#3b4957',
     padding: 15,
     borderRadius: 10,
-    color: "#fff",
+    color: '#fff',
     fontSize: 14,
     marginTop: 10,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   row: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
     padding: 30,
-    flexDirection: "column",
+    flexDirection: 'column',
     gap: 30,
   },
   heading: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    width: "100%",
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    width: '100%',
   },
   cardsList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     marginTop: 20,
     gap: 10,
   },
   card: {
-    width: screenWidth < 600 ? "100%" : "auto",
-    flexDirection: "column",
+    width: screenWidth < 600 ? '100%' : 'auto',
+    flexDirection: 'column',
     borderRadius: 20,
-    backgroundColor: "#4f5d75",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#4f5d75',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
     padding: 25,
     marginBottom: 15,
   },
   cardTitle: {
     fontSize: 16,
-    color: "#fff",
+    color: '#fff',
   },
   cardDescription: {
     fontSize: 10,
-    color: "#fff",
+    color: '#fff',
   },
   cardImage: {
-    width: "100%",
+    width: '100%',
     height: 150,
     borderRadius: 10,
   },

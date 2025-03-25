@@ -1,29 +1,29 @@
-import { Tabs } from "expo-router";
+import { Tabs } from 'expo-router';
 
-import Ionicons from "@expo/vector-icons/Ionicons";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#e97e67",
+        tabBarActiveTintColor: '#e97e67',
         headerStyle: {
-          backgroundColor: "#25292e",
+          backgroundColor: '#25292e',
         },
         headerShadowVisible: false,
-        headerTintColor: "#fff",
+        headerTintColor: '#fff',
         tabBarStyle: {
-          backgroundColor: "#25292e",
+          backgroundColor: '#25292e',
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: 'Home',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "home-sharp" : "home-outline"}
+              name={focused ? 'home-sharp' : 'home-outline'}
               color={color}
               size={24}
             />
@@ -33,11 +33,11 @@ export default function TabLayout() {
       <Tabs.Screen
         name="pickup"
         options={{
-          title: "Pickup",
+          title: 'Pickup',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={
-                focused ? "information" : "information-outline"
+                focused ? 'information' : 'information-outline'
               }
               color={color}
               size={24}
@@ -45,14 +45,14 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen 
+      <Tabs.Screen
         name="search"
         options={{
-          title: "Search", 
+          title: 'Search',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons 
+            <Ionicons
               name={
-                focused ? "search" : "search-outline"
+                focused ? 'search' : 'search-outline'
               }
               color={color}
               size={24}
@@ -60,14 +60,14 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen 
+      <Tabs.Screen
         name="orders"
         options={{
-          title: "Orders", 
+          title: 'Orders',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons 
+            <Ionicons
               name={
-                focused ? "receipt" : "receipt-outline"
+                focused ? 'receipt' : 'receipt-outline'
               }
               color={color}
               size={24}
@@ -75,14 +75,14 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen 
+      <Tabs.Screen
         name="account"
         options={{
-          title: "Accounts", 
+          title: 'Accounts',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons 
+            <Ionicons
               name={
-                focused ? "information" : "information-outline"
+                focused ? 'information' : 'information-outline'
               }
               color={color}
               size={24}
@@ -90,8 +90,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      
-      
+
     </Tabs>
   );
 }
