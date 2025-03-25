@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  ScrollView,
-  Image,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { Text, View, StyleSheet, ScrollView, Image, Pressable, ActivityIndicator } from "react-native";
 import { getAllRestaurants, Restaurant } from "@/services/api";
 import RestaurantCard from "@/components/RestaurantCard";
 import { router } from "expo-router";
@@ -15,9 +7,7 @@ import { router } from "expo-router";
 export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [featuredRestaurants, setFeaturedRestaurants] = useState<Restaurant[]>(
-    []
-  );
+  const [featuredRestaurants, setFeaturedRestaurants] = useState<Restaurant[]>([]);
 
   useEffect(() => {
     async function loadData() {
@@ -51,40 +41,24 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Image
-          source={require("@/assets/images/splash-icon.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <Image source={require("@/assets/images/fatcow.png")} style={styles.logo} resizeMode="contain" />
         <Text style={styles.welcomeText}>Fat Cow</Text>
-        <Text style={styles.subtitle}>
-          Delicious food delivered to your campus location
-        </Text>
+        <Text style={styles.subtitle}>Delicious food delivered to your campus location</Text>
       </View>
 
       <Text style={styles.sectionTitle}>Featured Restaurants</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.featuredContainer}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.featuredContainer}>
         {featuredRestaurants.map((restaurant) => (
           <RestaurantCard key={restaurant.id} restaurant={restaurant} compact />
         ))}
       </ScrollView>
 
       <View style={styles.actionSection}>
-        <Pressable
-          style={[styles.actionButton, styles.orderNowButton]}
-          onPress={() => router.push("/search")}
-        >
+        <Pressable style={[styles.actionButton, styles.orderNowButton]} onPress={() => router.push("/search")}>
           <Text style={styles.actionButtonText}>Find Food</Text>
         </Pressable>
 
-        <Pressable
-          style={[styles.actionButton, styles.trackOrderButton]}
-          onPress={() => router.push("/orders")}
-        >
+        <Pressable style={[styles.actionButton, styles.trackOrderButton]} onPress={() => router.push("/orders")}>
           <Text style={styles.actionButtonText}>Track Orders</Text>
         </Pressable>
       </View>
@@ -97,10 +71,7 @@ export default function HomeScreen() {
       </View>
 
       {restaurants.length > 6 && (
-        <Pressable
-          style={styles.viewAllButton}
-          onPress={() => router.push("/search")}
-        >
+        <Pressable style={styles.viewAllButton} onPress={() => router.push("/search")}>
           <Text style={styles.viewAllText}>View All Restaurants</Text>
         </Pressable>
       )}
