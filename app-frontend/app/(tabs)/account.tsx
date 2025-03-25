@@ -25,22 +25,21 @@ export default function AccountScreen() {
 
   return (
     <View style={styles.screenContainer}>
+      <Text style={styles.heading}>Profile</Text>
+      <View style={styles.optionsList}>
+        {options.map((o, index) => (
+          <Pressable key={index} style={styles.optionsButton} onPress={() => handleButtonClick(o.name)}>
+            <Text style={styles.optionsIcon}>{o.icon}</Text>
+            <Text style={styles.optionsType}>{o.name}</Text>
+          </Pressable>
+        ))}
+      </View>
+
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.heading}>Profile</Text>
-        <View style={styles.optionsList}>
-          {options.map((o, index) => (
-            <Pressable key={index} style={styles.optionsButton} onPress={() => handleButtonClick(o.name)}>
-              <Text style={styles.optionsIcon}>{o.icon}</Text>
-              <Text style={styles.optionsType}>{o.name}</Text>
-            </Pressable>
-          ))}
-        </View>
-
-        {/* Show personal information */}
         {personalDetails && (
           <View style={styles.cardList}>
             <View style={styles.card}>
@@ -58,7 +57,6 @@ export default function AccountScreen() {
           </View>
         )}
 
-        {/* Show order history */}
         {orderHistory && (
           <View style={styles.cardList}>
             <View style={styles.card}>
@@ -76,7 +74,6 @@ export default function AccountScreen() {
           </View>
         )}
 
-        {/* Show settings */}
         {settings && (
           <View style={styles.cardList}>
             <Text style={styles.sectionTitle}>General</Text>
@@ -135,6 +132,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
     width: "100%",
+    marginBottom: 10,
   },
   optionsList: {
     flexDirection: "row",
@@ -142,6 +140,8 @@ const styles = StyleSheet.create({
     gap: 10,
     borderRadius: 15,
     backgroundColor: "#3B4957",
+    alignSelf: "center",
+    marginBottom: 20,
   },
   optionsButton: {
     flexDirection: "row",
