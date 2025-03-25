@@ -1,0 +1,50 @@
+# Node
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Swagger (if YAML or generated JSON)
+swagger.json
+
+# Expo / React Native
+.expo/
+.expo-shared/
+*.apk
+*.ipa
+web-build/
+*.keystore
+*.jks
+
+# iOS / Android
+ios/
+android/
+
+# Bundler / cache
+metro-cache/
+babel-cache/
+cache/
+*.bundle
+
+# Clerk (if storing dev config)
+.clerk/

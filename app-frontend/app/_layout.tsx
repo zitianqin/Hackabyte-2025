@@ -1,6 +1,6 @@
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router';
 
-import { StatusBar } from "expo-status-bar";
+import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
   return (
