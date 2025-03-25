@@ -1,125 +1,310 @@
-import React from "react";
-import { Text, View, StyleSheet, ScrollView, TextInput, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  Dimensions,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
+import { getOrders, Order } from "@/services/api";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 
 export default function PickupScreen() {
-  const [search, setSearch] = React.useState("");
-  const delivery = [
-    {
-      store: "Boost Juice",
-      order: "Banana Buzz",
-      deliveryTime: "10 mins",
-      date: "25/03/2025",
-      location: "Ainsworth Cats Room 204",
-    },
-    {
-      store: "Plume Cafe",
-      order: "Coffe Frappe",
-      deliveryTime: "7 mins",
-      date: "21/03/2025",
-      location: "Main Library Lvl 4",
-    },
-    {
-      store: "Classic Kebab",
-      order: "Kebab",
-      deliveryTime: "6 mins",
-      date: "14/03/2025",
-      location: "Main Library Lvl 4",
-    },
-  ];
-  const filteredOptions = delivery.filter(
-    (d) =>
-      d.store.toLowerCase().includes(search.toLowerCase()) ||
-      d.order.toLowerCase().includes(search.toLowerCase()) ||
-      d.date.toLowerCase().includes(search.toLowerCase()) ||
-      d.location.toLowerCase().includes(search.toLowerCase())
+  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    async function loadOrders() {
+      try {
+        const fetchedOrders = await getOrders();
+        setOrders(fetchedOrders);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading orders:", error);
+        setLoading(false);
+      }
+    }
+
+    loadOrders();
+  }, []);
+
+  const activeOrders = orders.filter((o) =>
+    ["pending", "accepted", "picked_up", "on_the_way"].includes(o.status)
   );
+
+  const filteredOrders = activeOrders.filter(
+    (o) =>
+      o.restaurantName.toLowerCase().includes(search.toLowerCase()) ||
+      o.items.some((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
+      ) ||
+      o.deliveryLocation.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#e97e67" />
+        <Text style={styles.loadingText}>Loading your orders...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <Text style={styles.heading}>Pick Up / Delivered Orders</Text>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search for pick ups or deliveries..."
-          placeholderTextColor="#aaa"
-          value={search}
-          onChangeText={setSearch}
-        />
+      <View style={styles.header}>
+        <Text style={styles.heading}>Active Deliveries</Text>
+        <View style={styles.searchContainer}>
+          <Ionicons
+            name="search"
+            size={20}
+            color="#aaa"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search active deliveries..."
+            placeholderTextColor="#aaa"
+            value={search}
+            onChangeText={setSearch}
+          />
+        </View>
       </View>
-      <ScrollView contentContainerStyle={styles.cardsList} showsVerticalScrollIndicator={false}>
-        {filteredOptions.map((d, index) => (
-          <View key={index} style={styles.card}>
-            <Text style={styles.cardTitle}>{d.store}</Text>
-            <Text style={styles.cardDescription}>Order: {d.order}</Text>
-            <Text style={styles.cardDescription}>Delivery Time: {d.deliveryTime}</Text>
-            <Text style={styles.cardDescription}>Date: {d.date}</Text>
-            <Text style={styles.cardDescription}>Location: {d.location}</Text>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {filteredOrders.length > 0 ? (
+          <View style={styles.cardsList}>
+            {filteredOrders.map((order) => (
+              <Pressable
+                key={order.id}
+                style={styles.card}
+                onPress={() => router.push(`/order/${order.id}`)}
+              >
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{order.restaurantName}</Text>
+                  <View
+                    style={[styles.statusBadge, getStatusStyle(order.status)]}
+                  >
+                    <Text style={styles.statusText}>
+                      {getStatusLabel(order.status)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.orderDetails}>
+                  <View style={styles.detailRow}>
+                    <Ionicons
+                      name="restaurant-outline"
+                      size={16}
+                      color="#ccc"
+                    />
+                    <Text style={styles.orderItems}>
+                      {order.items
+                        .map((item) => `${item.quantity}x ${item.name}`)
+                        .join(", ")}
+                    </Text>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Ionicons name="location-outline" size={16} color="#ccc" />
+                    <Text style={styles.cardDescription}>
+                      {order.deliveryLocation}
+                    </Text>
+                  </View>
+
+                  {order.estimatedDeliveryTime && (
+                    <View style={styles.detailRow}>
+                      <Ionicons name="time-outline" size={16} color="#ccc" />
+                      <Text style={styles.cardDescription}>
+                        ETA: {order.estimatedDeliveryTime}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.cardFooter}>
+                  <Text style={styles.viewDetails}>View Order Details →</Text>
+                </View>
+              </Pressable>
+            ))}
           </View>
-        ))}
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="bicycle" size={64} color="#4f5d75" />
+            <Text style={styles.emptyText}>
+              {search
+                ? "No active deliveries found matching your search"
+                : "You don't have any active deliveries"}
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
+}
+
+function getStatusStyle(status: Order["status"]) {
+  switch (status) {
+    case "pending":
+      return styles.pendingBadge;
+    case "accepted":
+      return styles.acceptedBadge;
+    case "picked_up":
+      return styles.pickedUpBadge;
+    case "on_the_way":
+      return styles.onTheWayBadge;
+    default:
+      return {};
+  }
+}
+
+function getStatusLabel(status: Order["status"]) {
+  switch (status) {
+    case "pending":
+      return "Pending";
+    case "accepted":
+      return "Accepted";
+    case "picked_up":
+      return "Picked Up";
+    case "on_the_way":
+      return "On The Way";
+    default:
+      return status;
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#292f38",
-    padding: 20,
+    padding: 16,
   },
-  searchBar: {
-    width: "75%",
-    backgroundColor: "#3b4957",
-    padding: 15,
-    borderRadius: 10,
-    color: "#fff",
-    fontSize: 14,
-    marginTop: 10,
-    alignSelf: "center",
-  },
-  row: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    padding: 30,
-    flexDirection: "column",
-    gap: 30,
-  },
-  heading: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    width: "100%",
-  },
-  cardsList: {
-    flexDirection: "column",
-    flexWrap: "wrap",
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#292f38",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
-    gap: 10,
+  },
+  loadingText: {
+    color: "#fff",
+    marginTop: 10,
+    fontSize: 16,
+  },
+  header: {
+    marginVertical: 16,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 16,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#3b4957",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchBar: {
+    flex: 1,
+    height: 48,
+    color: "#fff",
+    fontSize: 16,
+  },
+  cardsList: {
+    marginTop: 16,
   },
   card: {
-    width: screenWidth < 600 ? "100%" : "55%",
-    flexDirection: "column",
-    borderRadius: 20,
-    backgroundColor: "#4f5d75",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    gap: 10,
-    padding: 25,
-    marginBottom: 15,
+    width: "100%",
+    backgroundColor: "#3b4957",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
   },
   cardTitle: {
-    fontSize: 16,
-    color: "#fff",
+    fontSize: 18,
     fontWeight: "bold",
+    color: "#fff",
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  pendingBadge: {
+    backgroundColor: "#f1c40f",
+  },
+  acceptedBadge: {
+    backgroundColor: "#3498db",
+  },
+  pickedUpBadge: {
+    backgroundColor: "#9b59b6",
+  },
+  onTheWayBadge: {
+    backgroundColor: "#2ecc71",
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  orderDetails: {
+    marginBottom: 12,
+  },
+  detailRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  orderItems: {
+    flex: 1,
+    fontSize: 14,
+    color: "#fff",
+    marginLeft: 8,
   },
   cardDescription: {
-    fontSize: 13,
-    color: "#fff",
+    fontSize: 14,
+    color: "#ccc",
+    marginLeft: 8,
+  },
+  cardFooter: {
+    borderTopWidth: 1,
+    borderTopColor: "#4f5d75",
+    paddingTop: 12,
+    alignItems: "flex-end",
+  },
+  viewDetails: {
+    fontSize: 14,
+    color: "#e97e67",
+    fontWeight: "bold",
+  },
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 40,
+    marginTop: 40,
+  },
+  emptyText: {
+    color: "#ccc",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 16,
   },
 });

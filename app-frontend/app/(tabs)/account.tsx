@@ -1,110 +1,304 @@
-import { Text, View, StyleSheet, Pressable, ScrollView } from 'react-native';
-import React from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Image,
+} from "react-native";
+import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function AccountScreen() {
-  const [personalDetails, setPersonalDetails] = React.useState(false);
-  const [orderHistory, setOrderHistory] = React.useState(false);
-  const [settings, setSettings] = React.useState(false);
+  const [activeSection, setActiveSection] = useState("personal");
 
-  const options = [
-    { name: 'Personal Information', icon: 'ℹ' },
-    { name: 'Order History', icon: '🧾' },
-    { name: 'Notifications', icon: '✉️' },
-    { name: 'Settings', icon: '⚙️' },
-  ];
+  const handleSectionPress = (section: string) => {
+    setActiveSection(section);
+  };
 
-  const handleButtonClick = (name: string) => {
-    setPersonalDetails(false);
-    setOrderHistory(false);
-    setSettings(false);
-
-    name === 'Personal Information' && setPersonalDetails(true);
-    name === 'Order History' && setOrderHistory(true);
-    name === 'Settings' && setSettings(true);
+  // Mock user data
+  const userData = {
+    name: "John Smith",
+    email: "john.smith@student.unsw.edu.au",
+    phone: "0412 345 678",
+    location: "Upper Campus, UNSW Sydney",
+    memberSince: "March 2025",
+    orders: [
+      {
+        id: "1234",
+        restaurant: "Yallah",
+        items: "HSP with extra sauce",
+        date: "24 March 2025",
+        price: "$18.50",
+        status: "delivered",
+      },
+      {
+        id: "1235",
+        restaurant: "Tropical Green",
+        items: "Pho with chicken",
+        date: "23 March 2025",
+        price: "$14.90",
+        status: "delivered",
+      },
+      {
+        id: "1236",
+        restaurant: "Soul Origin",
+        items: "Turkey & Cranberry Sandwich",
+        date: "20 March 2025",
+        price: "$9.90",
+        status: "cancelled",
+      },
+    ],
   };
 
   return (
-    <View style={styles.screenContainer}>
-      <Text style={styles.heading}>Profile</Text>
-      <View style={styles.optionsList}>
-        {options.map((o, index) => (
-          <Pressable key={index} style={styles.optionsButton} onPress={() => handleButtonClick(o.name)}>
-            <Text style={styles.optionsIcon}>{o.icon}</Text>
-            <Text style={styles.optionsType}>{o.name}</Text>
-          </Pressable>
-        ))}
+    <View style={styles.container}>
+      {/* Profile Header */}
+      <LinearGradient colors={["#3b4957", "#25292e"]} style={styles.header}>
+        <View style={styles.profileImageContainer}>
+          <Text style={styles.profileInitials}>{userData.name.charAt(0)}</Text>
+        </View>
+        <Text style={styles.userName}>{userData.name}</Text>
+        <Text style={styles.userEmail}>{userData.email}</Text>
+        <Text style={styles.memberSince}>
+          Member since {userData.memberSince}
+        </Text>
+      </LinearGradient>
+
+      {/* Navigation Tabs */}
+      <View style={styles.tabContainer}>
+        <Pressable
+          style={[styles.tab, activeSection === "personal" && styles.activeTab]}
+          onPress={() => handleSectionPress("personal")}
+        >
+          <Ionicons
+            name="person"
+            size={20}
+            color={activeSection === "personal" ? "#e97e67" : "#ccc"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeSection === "personal" && styles.activeTabText,
+            ]}
+          >
+            Profile
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.tab, activeSection === "orders" && styles.activeTab]}
+          onPress={() => handleSectionPress("orders")}
+        >
+          <Ionicons
+            name="receipt"
+            size={20}
+            color={activeSection === "orders" ? "#e97e67" : "#ccc"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeSection === "orders" && styles.activeTabText,
+            ]}
+          >
+            Orders
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.tab, activeSection === "settings" && styles.activeTab]}
+          onPress={() => handleSectionPress("settings")}
+        >
+          <Ionicons
+            name="settings"
+            size={20}
+            color={activeSection === "settings" ? "#e97e67" : "#ccc"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeSection === "settings" && styles.activeTabText,
+            ]}
+          >
+            Settings
+          </Text>
+        </Pressable>
       </View>
 
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        {personalDetails && (
-          <View style={styles.cardList}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Name</Text>
-              <Text style={styles.cardDescription}>some rando name</Text>
+      {/* Content Section */}
+      <ScrollView style={styles.contentContainer}>
+        {activeSection === "personal" && (
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Personal Information</Text>
+
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <Ionicons
+                  name="call-outline"
+                  size={20}
+                  color="#e97e67"
+                  style={styles.infoIcon}
+                />
+                <View>
+                  <Text style={styles.infoLabel}>Phone Number</Text>
+                  <Text style={styles.infoValue}>{userData.phone}</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Email</Text>
-              <Text style={styles.cardDescription}>somerandoname@example.com</Text>
+
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <Ionicons
+                  name="mail-outline"
+                  size={20}
+                  color="#e97e67"
+                  style={styles.infoIcon}
+                />
+                <View>
+                  <Text style={styles.infoLabel}>Email Address</Text>
+                  <Text style={styles.infoValue}>{userData.email}</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Phone</Text>
-              <Text style={styles.cardDescription}>1234-567-890</Text>
+
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <Ionicons
+                  name="location-outline"
+                  size={20}
+                  color="#e97e67"
+                  style={styles.infoIcon}
+                />
+                <View>
+                  <Text style={styles.infoLabel}>Default Location</Text>
+                  <Text style={styles.infoValue}>{userData.location}</Text>
+                </View>
+              </View>
             </View>
+
+            <Pressable style={styles.editButton}>
+              <Text style={styles.editButtonText}>Edit Profile</Text>
+            </Pressable>
           </View>
         )}
 
-        {orderHistory && (
-          <View style={styles.cardList}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Store: Yallah</Text>
-              <Text style={styles.cardDescription}>Order: HSP .....</Text>
-              <Text style={styles.cardDescription}>Date: 25/03/2025</Text>
-              <Text style={styles.cardDescription}>Price: $190.78</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Store: Tropical Green</Text>
-              <Text style={styles.cardDescription}>Order: Pho .....</Text>
-              <Text style={styles.cardDescription}>Date: 25/03/2025</Text>
-              <Text style={styles.cardDescription}>Price: $12</Text>
-            </View>
+        {activeSection === "orders" && (
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Order History</Text>
+
+            {userData.orders.map((order, index) => (
+              <View key={index} style={styles.orderCard}>
+                <View style={styles.orderHeader}>
+                  <Text style={styles.restaurantName}>{order.restaurant}</Text>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      order.status === "delivered"
+                        ? styles.deliveredBadge
+                        : styles.cancelledBadge,
+                    ]}
+                  >
+                    <Text style={styles.statusText}>
+                      {order.status === "delivered" ? "Delivered" : "Cancelled"}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.orderDetail}>
+                  <Text style={styles.orderItems}>{order.items}</Text>
+                  <Text style={styles.orderDate}>{order.date}</Text>
+                  <View style={styles.orderPriceRow}>
+                    <Text style={styles.orderPrice}>{order.price}</Text>
+                    <Pressable style={styles.viewButton}>
+                      <Text style={styles.viewButtonText}>View Details</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
         )}
 
-        {settings && (
-          <View style={styles.cardList}>
-            <Text style={styles.sectionTitle}>General</Text>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Payment</Text>
-              <Text style={styles.cardAction}>Add payment method</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Favourites</Text>
-              <Text style={styles.cardAction}>See favourited stores</Text>
+        {activeSection === "settings" && (
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Settings</Text>
+
+            <View style={styles.settingsCard}>
+              <Pressable style={styles.settingRow}>
+                <Ionicons
+                  name="notifications-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
+                <View style={styles.settingTextContainer}>
+                  <Text style={styles.settingTitle}>Notifications</Text>
+                  <Text style={styles.settingDescription}>
+                    Manage delivery and promotional notifications
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#ccc" />
+              </Pressable>
+
+              <Pressable style={styles.settingRow}>
+                <Ionicons
+                  name="card-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
+                <View style={styles.settingTextContainer}>
+                  <Text style={styles.settingTitle}>Payment Methods</Text>
+                  <Text style={styles.settingDescription}>
+                    Add or edit payment methods
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#ccc" />
+              </Pressable>
+
+              <Pressable style={styles.settingRow}>
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
+                <View style={styles.settingTextContainer}>
+                  <Text style={styles.settingTitle}>Privacy</Text>
+                  <Text style={styles.settingDescription}>
+                    Manage privacy settings and data
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#ccc" />
+              </Pressable>
+
+              <Pressable style={styles.settingRow}>
+                <Ionicons
+                  name="help-circle-outline"
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
+                <View style={styles.settingTextContainer}>
+                  <Text style={styles.settingTitle}>Help & Support</Text>
+                  <Text style={styles.settingDescription}>
+                    Contact customer service
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#ccc" />
+              </Pressable>
             </View>
 
-            <Text style={styles.sectionTitle}>Account Settings</Text>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Privacy</Text>
-              <Text style={styles.cardAction}>Learn about privacy</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Notifications</Text>
-              <Text style={styles.cardAction}>Manage delivery and promotional notifications</Text>
-            </View>
-
-            <Text style={styles.sectionTitle}>More</Text>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Become a Partner Restaurant</Text>
-              <Text style={styles.cardAction}>Join</Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Become a COW</Text>
-              <Text style={styles.cardAction}>Join</Text>
-            </View>
+            <Pressable style={styles.logoutButton}>
+              <Ionicons
+                name="log-out-outline"
+                size={20}
+                color="#fff"
+                style={styles.logoutIcon}
+              />
+              <Text style={styles.logoutText}>Log Out</Text>
+            </Pressable>
           </View>
         )}
       </ScrollView>
@@ -113,88 +307,232 @@ export default function AccountScreen() {
 }
 
 const styles = StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    backgroundColor: '#292f38',
-    paddingVertical: 50,
-  },
-  scrollContainer: {
-    flex: 1,
-    width: '100%',
-    paddingHorizontal: 100,
-  },
   container: {
-    alignItems: 'center',
-    gap: 30,
+    flex: 1,
+    backgroundColor: "#292f38",
   },
-  heading: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    width: '100%',
-    marginBottom: 20,
-  },
-  optionsList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    borderRadius: 15,
-    backgroundColor: '#3B4957',
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  optionsButton: {
-    flexDirection: 'row',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: '#4F5D75',
-    borderRadius: 15,
-    gap: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  optionsIcon: {
-    fontSize: 12,
-    color: '#fff',
-  },
-  optionsType: {
-    fontSize: 12,
-    color: '#fff',
-  },
-  cardList: {
-    flexDirection: 'column',
-    gap: 10,
-    width: '100%',
-    paddingBottom: 30,
-  },
-  card: {
+  header: {
     padding: 20,
-    alignItems: 'flex-start',
-    width: '100%',
-    backgroundColor: 'white',
-    borderRadius: 10,
+    alignItems: "center",
+    paddingTop: 40,
+    paddingBottom: 25,
   },
-  cardTitle: {
+  profileImageContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#e97e67",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  profileInitials: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 5,
+  },
+  userEmail: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#25292e',
+    color: "#ccc",
+    marginBottom: 5,
   },
-  cardDescription: {
+  memberSince: {
     fontSize: 12,
-    color: '#25292e',
+    color: "#ccc",
+    opacity: 0.8,
   },
-  cardAction: {
-    fontSize: 12,
-    backgroundColor: '#4F5D75',
-    padding: 10,
-    borderRadius: 10,
-    color: '#fff',
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#3b4957",
+    paddingVertical: 12,
+  },
+  tab: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    paddingVertical: 8,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: "#e97e67",
+  },
+  tabText: {
+    color: "#ccc",
+    marginLeft: 5,
+    fontSize: 14,
+  },
+  activeTabText: {
+    color: "#e97e67",
+    fontWeight: "bold",
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: "#292f38",
+  },
+  sectionContainer: {
+    padding: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    color: '#fff',
-    marginTop: 20,
-    marginBottom: 10,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 16,
+  },
+  infoCard: {
+    backgroundColor: "#3b4957",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  infoIcon: {
+    marginRight: 16,
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: "#ccc",
+  },
+  infoValue: {
+    fontSize: 15,
+    color: "#fff",
+    fontWeight: "500",
+  },
+  editButton: {
+    backgroundColor: "#4f5d75",
+    borderRadius: 8,
+    padding: 14,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  editButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  orderCard: {
+    backgroundColor: "#3b4957",
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  orderHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#4f5d75",
+  },
+  restaurantName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  deliveredBadge: {
+    backgroundColor: "#2ecc71",
+  },
+  cancelledBadge: {
+    backgroundColor: "#e74c3c",
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  orderDetail: {
+    padding: 16,
+  },
+  orderItems: {
+    fontSize: 14,
+    color: "#fff",
+    marginBottom: 8,
+  },
+  orderDate: {
+    fontSize: 12,
+    color: "#ccc",
+    marginBottom: 12,
+  },
+  orderPriceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  orderPrice: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#e97e67",
+  },
+  viewButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#4f5d75",
+    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  viewButtonText: {
+    color: "#ccc",
+    fontSize: 12,
+  },
+  settingsCard: {
+    backgroundColor: "#3b4957",
+    borderRadius: 12,
+    overflow: "hidden",
+    marginBottom: 20,
+  },
+  settingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#4f5d75",
+  },
+  settingIcon: {
+    marginRight: 16,
+  },
+  settingTextContainer: {
+    flex: 1,
+  },
+  settingTitle: {
+    fontSize: 15,
+    color: "#fff",
+    fontWeight: "500",
+  },
+  settingDescription: {
+    fontSize: 12,
+    color: "#ccc",
+    marginTop: 2,
+  },
+  logoutButton: {
+    backgroundColor: "#e74c3c",
+    borderRadius: 8,
+    padding: 14,
+    alignItems: "center",
+    marginTop: 8,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  logoutIcon: {
+    marginRight: 8,
+  },
+  logoutText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
   },
 });
