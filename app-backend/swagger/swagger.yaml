@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Campus Delivery API
+  title: Fat Cow API
   description: MVP API for a university campus food delivery service
   version: 1.0.0
 
@@ -91,20 +91,6 @@ paths:
     post:
       summary: Submit feedback
       description: Allows users to leave feedback after order completion
-      security:
-        - BearerAuth: []
-
-  /api/restaurants:
-    get:
-      summary: Get restaurants
-      description: Retrieves a list of available restaurants
-      security:
-        - BearerAuth: []
-
-  /api/restaurants/{restaurantId}:
-    get:
-      summary: Get restaurant details
-      description: Retrieves details for a specific restaurant
       security:
         - BearerAuth: []
 
