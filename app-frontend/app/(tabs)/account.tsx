@@ -115,7 +115,8 @@ export default function AccountScreen() {
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    backgroundColor: "#25292e",
+    backgroundColor: "#292f38",
+    paddingVertical: 50,
   },
   scrollContainer: {
     flex: 1,
