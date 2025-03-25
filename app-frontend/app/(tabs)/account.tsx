@@ -4,17 +4,23 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  Image,
+  Switch,
 } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAppContext } from "@/services/AppContext";
 
 export default function AccountScreen() {
   const [activeSection, setActiveSection] = useState("personal");
+  const { appMode, setAppMode } = useAppContext();
 
   const handleSectionPress = (section: string) => {
     setActiveSection(section);
+  };
+
+  const handleToggleAppMode = () => {
+    setAppMode(appMode === "customer" ? "worker" : "customer");
   };
 
   // Mock user data
@@ -64,6 +70,11 @@ export default function AccountScreen() {
         <Text style={styles.memberSince}>
           Member since {userData.memberSince}
         </Text>
+        <View style={styles.modeIndicator}>
+          <Text style={styles.modeLabel}>
+            {appMode === "customer" ? "Customer Mode" : "Worker Mode"}
+          </Text>
+        </View>
       </LinearGradient>
 
       {/* Navigation Tabs */}
@@ -225,6 +236,38 @@ export default function AccountScreen() {
             <Text style={styles.sectionTitle}>Settings</Text>
 
             <View style={styles.settingsCard}>
+              {/* Mode toggle switch */}
+              <View style={styles.settingRow}>
+                <Ionicons
+                  name={
+                    appMode === "customer"
+                      ? "fast-food-outline"
+                      : "bicycle-outline"
+                  }
+                  size={22}
+                  color="#e97e67"
+                  style={styles.settingIcon}
+                />
+                <View style={styles.settingTextContainer}>
+                  <Text style={styles.settingTitle}>
+                    {appMode === "customer"
+                      ? "Switch to Delivery Person"
+                      : "Switch to Customer"}
+                  </Text>
+                  <Text style={styles.settingDescription}>
+                    {appMode === "customer"
+                      ? "Become a delivery person to earn money by delivering food"
+                      : "Switch back to customer mode to order food"}
+                  </Text>
+                </View>
+                <Switch
+                  trackColor={{ false: "#4f5d75", true: "#e97e67" }}
+                  thumbColor="#fff"
+                  onValueChange={handleToggleAppMode}
+                  value={appMode === "worker"}
+                />
+              </View>
+
               <Pressable style={styles.settingRow}>
                 <Ionicons
                   name="notifications-outline"
@@ -346,6 +389,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#ccc",
     opacity: 0.8,
+  },
+  modeIndicator: {
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    backgroundColor: "#4f5d75",
+  },
+  modeLabel: {
+    fontSize: 12,
+    color: "#fff",
   },
   tabContainer: {
     flexDirection: "row",
