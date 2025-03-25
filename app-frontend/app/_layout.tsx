@@ -1,10 +1,10 @@
 import { Stack } from "expo-router";
-
 import { StatusBar } from "expo-status-bar";
+import { AppProvider } from "@/services/AppContext";
 
 export default function RootLayout() {
   return (
-    <>
+    <AppProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
@@ -17,6 +17,6 @@ export default function RootLayout() {
         />
       </Stack>
       <StatusBar style="light" />
-    </>
+    </AppProvider>
   );
 }

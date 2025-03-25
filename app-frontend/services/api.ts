@@ -1,5 +1,132 @@
 const API_BASE_URL = "http://localhost:3000";
 
+// App mode types and context
+export type AppMode = "customer" | "worker";
+
+// Mock data for available deliveries (for workers)
+export const availableDeliveries: Order[] = [
+  {
+    id: "delivery-1",
+    restaurantId: "rest-3",
+    restaurantName: "Soul Origin",
+    items: [
+      {
+        id: "item-10",
+        menuItemId: "menu-3-0",
+        name: "Chicken Sandwich",
+        quantity: 1,
+        price: 12,
+      },
+      {
+        id: "item-11",
+        menuItemId: "menu-3-1",
+        name: "Water Bottle",
+        quantity: 1,
+        price: 3,
+      },
+    ],
+    status: "pending",
+    total: 15,
+    deliveryLocation: "Engineering Building, Level 2",
+    createdAt: new Date(Date.now() - 10 * 60000).toISOString(),
+    estimatedDeliveryTime: "20-25 mins",
+  },
+  {
+    id: "delivery-2",
+    restaurantId: "rest-7",
+    restaurantName: "Guzman y Gomez",
+    items: [
+      {
+        id: "item-12",
+        menuItemId: "menu-7-0",
+        name: "Burrito Bowl",
+        quantity: 1,
+        price: 16,
+      },
+      {
+        id: "item-13",
+        menuItemId: "menu-7-1",
+        name: "Nachos",
+        quantity: 1,
+        price: 10,
+      },
+    ],
+    status: "pending",
+    total: 26,
+    deliveryLocation: "Law Building, Reception",
+    createdAt: new Date(Date.now() - 15 * 60000).toISOString(),
+    estimatedDeliveryTime: "15-20 mins",
+  },
+];
+
+// Mock active deliveries for workers
+export const workerDeliveries: Order[] = [
+  {
+    id: "worker-delivery-1",
+    restaurantId: "rest-12",
+    restaurantName: "Subway",
+    items: [
+      {
+        id: "item-20",
+        menuItemId: "menu-12-0",
+        name: "Footlong Italian BMT",
+        quantity: 1,
+        price: 14,
+      },
+      {
+        id: "item-21",
+        menuItemId: "menu-12-1",
+        name: "Cookie",
+        quantity: 2,
+        price: 4,
+      },
+    ],
+    status: "picked_up",
+    total: 18,
+    deliveryLocation: "Business School, Level 1",
+    createdAt: new Date(Date.now() - 20 * 60000).toISOString(),
+    estimatedDeliveryTime: "5-10 mins",
+    deliveryPersonId: "worker-1",
+  },
+];
+
+// Mock earnings history for workers
+export interface Earning {
+  id: string;
+  orderId: string;
+  restaurantName: string;
+  amount: number;
+  date: string;
+  status: "completed" | "pending";
+}
+
+export const earningsHistory: Earning[] = [
+  {
+    id: "earning-1",
+    orderId: "order-past-1",
+    restaurantName: "Yallah",
+    amount: 5.5,
+    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    status: "completed",
+  },
+  {
+    id: "earning-2",
+    orderId: "order-past-2",
+    restaurantName: "Subway",
+    amount: 6.0,
+    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    status: "completed",
+  },
+  {
+    id: "earning-3",
+    orderId: "worker-delivery-1",
+    restaurantName: "Subway",
+    amount: 6.5,
+    date: new Date(Date.now() - 20 * 60000).toISOString(),
+    status: "pending",
+  },
+];
+
 export interface Restaurant {
   id: string;
   name: string;
@@ -241,4 +368,92 @@ export const submitFeedback = async (
   // });
 
   console.log("Feedback submitted:", feedback);
+};
+
+// Worker-specific API functions
+export const getAvailableDeliveries = async (): Promise<Order[]> => {
+  // In a real app, this would fetch from the API
+  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries/available`);
+  // return response.json();
+
+  return availableDeliveries;
+};
+
+export const getWorkerDeliveries = async (): Promise<Order[]> => {
+  // In a real app, this would fetch from the API
+  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries`);
+  // return response.json();
+
+  return workerDeliveries;
+};
+
+export const acceptDelivery = async (orderId: string): Promise<Order> => {
+  // In a real app, this would POST to the API
+  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries/${orderId}/accept`, {
+  //   method: 'POST'
+  // });
+  // return response.json();
+
+  const order = availableDeliveries.find((o) => o.id === orderId);
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  // Update order status and add to worker deliveries
+  order.status = "accepted";
+  order.deliveryPersonId = "worker-1"; // Mock worker ID
+  workerDeliveries.push(order);
+
+  // Remove from available deliveries
+  const index = availableDeliveries.findIndex((o) => o.id === orderId);
+  if (index !== -1) {
+    availableDeliveries.splice(index, 1);
+  }
+
+  return order;
+};
+
+export const updateDeliveryStatus = async (
+  orderId: string,
+  status: Order["status"]
+): Promise<Order> => {
+  // In a real app, this would PUT to the API
+  // const response = await fetch(`${API_BASE_URL}/api/worker/deliveries/${orderId}/status`, {
+  //   method: 'PUT',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify({ status })
+  // });
+  // return response.json();
+
+  // Find the order in worker deliveries
+  const order = workerDeliveries.find((o) => o.id === orderId);
+  if (!order) {
+    throw new Error("Delivery not found");
+  }
+
+  order.status = status;
+
+  // If delivered, add to earnings
+  if (status === "delivered") {
+    const earning: Earning = {
+      id: `earning-${Date.now()}`,
+      orderId: order.id,
+      restaurantName: order.restaurantName,
+      amount: parseFloat((order.total * 0.3).toFixed(2)), // 30% of order total as earnings
+      date: new Date().toISOString(),
+      status: "pending",
+    };
+
+    earningsHistory.push(earning);
+  }
+
+  return order;
+};
+
+export const getEarningsHistory = async (): Promise<Earning[]> => {
+  // In a real app, this would fetch from the API
+  // const response = await fetch(`${API_BASE_URL}/api/worker/earnings`);
+  // return response.json();
+
+  return earningsHistory;
 };
